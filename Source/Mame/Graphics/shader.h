@@ -5,8 +5,9 @@
 #include <memory>
 #include <wrl.h>
 
-#include "../Graphics/Camera.h"
+#include "ConstantBuffer.h"
 
+#include "../Graphics/Camera.h"
 
 // SHADOW
 #include "../Graphics/ShadowMap.h"
@@ -34,13 +35,6 @@ public: // enum関連
     enum class BLEND_STATE { NONE, ALPHA, ADD, MULTIPLY };
     enum class RASTER_STATE { SOLID, WIREFRAME, CULL_NONE, WIREFRAME_CULL_NONE };
 
-    enum class CONSTANT_BUFFER 
-    {
-        CONSTANT_BUFFER_PARAMETRIC,
-        LIGHT_CONSTANT,
-        FOG_CONSTANT,
-        POST_EFFECT_CONSTANT,
-    };
 
 public:
     struct View
@@ -68,23 +62,10 @@ public:
         DirectX::XMFLOAT4X4 inverseViewProjection;
         float time;
 
-        float pads[3];
+        DirectX::XMFLOAT3 dummy{};
     };
 
-    // FOG
-    struct FogConstants
-    {
-        DirectX::XMFLOAT4 fogColor = { 1.000f, 1.000f, 1.000f, 0.894f }; // w: fog intensuty
-        float fogDensity = 0.0005f;
-        //float fogHeightFalloff = 0.9313f;
-        float fogHeightFalloff = 10.0f;
-        float startDistance = 5.00f;
-        float fogCutoffDistance = 500.0f;
-        float timeScale = 0.5f;
-        float speedScale = 0.2f;
-        float pads[2];
-    }fogConstants;
-
+#pragma region Light[struct]
     // DIRECTION_LIGHT
     struct DirectionLight
     {
@@ -101,7 +82,6 @@ public:
         DirectX::XMFLOAT3 step = {};        // ダミー
     };
 
-
     // SPOT_LIGHT
     struct SpotLight
     {
@@ -112,6 +92,7 @@ public:
         DirectX::XMFLOAT3 direction = {};   // スポットライトの射出方向
         float angle = 0;                    // スポットライトの射出角度
     };
+#pragma endregion// Light[struct]
 
     // HEMISPHERE_LIGHT
     struct HemisphereLight
@@ -135,6 +116,22 @@ public:
         HemisphereLight hemisphereLight;    // 半球ライト
     }lightConstant;
 
+
+    // FOG
+    struct FogConstants
+    {
+        DirectX::XMFLOAT4 fogColor = { 1.000f, 1.000f, 1.000f, 0.894f }; // w: fog intensuty
+        float fogDensity = 0.0005f;
+        //float fogHeightFalloff = 0.9313f;
+        float fogHeightFalloff = 10.0f;
+        float startDistance = 5.00f;
+        float fogCutoffDistance = 500.0f;
+        float timeScale = 0.5f;
+        float speedScale = 0.2f;
+        float pads[2];
+    };
+
+    // postEffect
     struct PostEffectConstants
     {
         DirectX::XMFLOAT4 shiftSize = {};
@@ -142,30 +139,45 @@ public:
         DirectX::XMFLOAT4 noiseColor{ 1.0f,1.0f,1.0f,1.0f };
         float noiseTimer = 0.0f;
         float scanLineTimer = 0.0f;
-        
+
         float bokehAperture = 0.0f;
         float bokehFocus = 0.3f;
 
         float vignetteValue = 0.2f;
         DirectX::XMFLOAT3 dummy;
-    }postEffectConstants;
+    };
+
+    // Emissice
+    struct EmissiceConstants
+    {
+        DirectX::XMFLOAT4 emissiceColor_ = { 1, 1, 1, 1 };
+        float emissiveIntensity = 1.5f;
+        DirectX::XMFLOAT3 dummy{};
+    };
+
+private:// Constants
+    std::unique_ptr<ConstantBuffer<FogConstants>> fogConstants_;                // fog
+    std::unique_ptr<ConstantBuffer<PostEffectConstants>> postEffectConstants_;  // postEffect
+    std::unique_ptr<ConstantBuffer<EmissiceConstants>> emissiveConstants_;      // emissive
 
 public:
     Shader(ID3D11Device* device);
     ~Shader() {}
 
-    void Initialize();
-
-    // 描画開始
-    void Begin(ID3D11DeviceContext* dc);
-
-
     void DrawDebug();
 
-public:// 定数バッファー
+public:// 定数バッファー [Update. Get. Set]
+#pragma region UpdateConstants
     void UpdatePostEffectConstants(int slot);
     void UpdateFogConstants(int slot);
+    void UpdateEmissiveConstants(int slot);
+#pragma endregion// UpdateConstants
 
+#pragma region [Get,Set]Function
+    // ----- Emissive -----
+    void SetEmissiveColor(DirectX::XMFLOAT4 color) { emissiveConstants_->data.emissiceColor_ = color; }
+    void SetEmissiveIntensity(float intensity) { emissiveConstants_->data.emissiveIntensity = intensity; }
+#pragma endregion[Get,Set]Function
 
 public:// 各種ステート設定
     void SetDepthStencileState(DEPTH_STATE depthStencileState);
@@ -180,36 +192,6 @@ public:
 
 
 private:
-
-    static const int MaxBones = 128;
-
-    Microsoft::WRL::ComPtr<ID3D11Buffer> ConstantBuffer[10];
-
-
-
-    struct CBMesh
-    {
-        DirectX::XMFLOAT4X4 boneTransformas[MaxBones];
-    };
-
-    struct CBSubset
-    {
-        DirectX::XMFLOAT4 materialColor;
-    };
-
-    struct CBParametric
-    {
-        float extraction_threshold{ 0.8f };
-        float gaussian_sigma{ 1.0f };
-        float bloom_intensity{ 1.0f };
-        float exposure{ 1.0f };
-    };
-
-
-
-    Microsoft::WRL::ComPtr<ID3D11Buffer> meshConstantBuffer;
-    Microsoft::WRL::ComPtr<ID3D11Buffer> subsetConstantBuffer;
-
     Microsoft::WRL::ComPtr<ID3D11VertexShader>  vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader>   pixelShader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout>   inputLayout;

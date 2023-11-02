@@ -73,7 +73,7 @@ void FetchBoneInfluences(const FbxMesh* fbxMesh,
             {
                 int controlPointIndex{ fbxCluster->GetControlPointIndices()[controlPointIndicesIndex] };
                 double controlPointWeight
-                { fbxCluster->GetControlPointWeights()[controlPointIndex] };
+                { fbxCluster->GetControlPointWeights()[controlPointIndicesIndex] };
                 boneInfluence& boneInfluence{ boneInfluences.at(controlPointIndex).emplace_back() };
                 boneInfluence.boneIndex = static_cast<uint32_t>(clusterIndex);
                 boneInfluence.boneWeight = static_cast<float>(controlPointWeight);

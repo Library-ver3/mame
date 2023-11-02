@@ -1,4 +1,4 @@
-#include "fullscreen_quad.hlsli"
+#include "FullScreenQuad.hlsli"
 
 cbuffer PARAMETRIC_CONSTANT_BUFFER : register(b2)
 {
@@ -16,12 +16,12 @@ cbuffer PARAMETRIC_CONSTANT_BUFFER : register(b2)
 SamplerState sampler_states[5] : register(s0);
 Texture2D texture_maps[4] : register(t0);
 
-float4 main(VS_OUT pin) : SV_TARGET
+float4 main(PSIn psIn) : SV_TARGET
 {
     int mip_level = 0, width, height, number_of_levels;
     texture_maps[1].GetDimensions(mip_level, width, height, number_of_levels);
 
-    float4 color = texture_maps[0].Sample(sampler_states[ANISOTROPIC], pin.texcoord);
+    float4 color = texture_maps[0].Sample(sampler_states[ANISOTROPIC], psIn.texcoord);
     float alpha = color.a;
 
     float3 blur_color = 0;
@@ -37,7 +37,7 @@ float4 main(VS_OUT pin) : SV_TARGET
         {
             float gaussian_kernel = exp(-(x * x + y * y) / (2.0 * gaussian_sigma * gaussian_sigma)) /
                 (2 * 3.14159265358979 * gaussian_sigma * gaussian_sigma);
-            blur_color += texture_maps[1].Sample(sampler_states[LINEAR], pin.texcoord +
+            blur_color += texture_maps[1].Sample(sampler_states[LINEAR], psIn.texcoord +
                 float2(x * 1.0 / width, y * 1.0 / height)).rgb * gaussian_kernel;
             gaussian_kernel_total += gaussian_kernel;
         }

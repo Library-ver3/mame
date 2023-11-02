@@ -1,66 +1,40 @@
 #include "SceneTitle.h"
-#include "SceneGame.h"
-#include "SceneLoading.h"
 
 #include "../Graphics/Graphics.h"
-#include "../Input/Input.h"
+#include "../Graphics/shader.h"
 
-#include "../Resource/AudioManager.h"
-
-#include "../Other/misc.h"
-#include "../Resource/texture.h"
-
-#include "../Core/framework.h"
+#include "../Other/Easing.h"
 
 // リソース生成
 void SceneTitle::CreateResource()
 {
     Graphics& graphics = Graphics::Instance();
 
+    // Sprite
     {
-        framebuffers[0] = std::make_unique<FrameBuffer>(graphics.GetDevice(), 1280, 720, false);
-        bitBlockTransfer = std::make_unique<FullscreenQuad>(graphics.GetDevice());
-        CreatePsFromCso(graphics.GetDevice(), "./Resources/Shader/finalPassPs.cso", finalPassPS.GetAddressOf());
-
-        bloomer = std::make_unique<Bloom>(graphics.GetDevice(), 1280 / 1, 720 / 1);
-        CreatePsFromCso(graphics.GetDevice(), "./Resources/Shader/finalPassPs.cso", bloomPS.GetAddressOf());
-
-        framebuffers[1] = std::make_unique<FrameBuffer>(graphics.GetDevice(), 1280 / 1, 720 / 1, false);
-        CreatePsFromCso(graphics.GetDevice(), "./Resources/Shader/FogPS.cso", fogPS.GetAddressOf());
+        titleLogoSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/Title/Emma.png");
+        pressAnyButtonSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/Title/PressAnyButton.png");
+        LoadGameSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/Title/LoadGame.png");
+        QuitGameSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/Title/QuitGame.png");
     }
 
-    // shadow
+    // シェーダー関連
     {
-        shadow.shadowMap = std::make_unique<ShadowMap>(graphics.GetDevice(),
-            shadow.shadowMapWidth, shadow.shadowMapHeight);
+        frameBuffer_ = std::make_unique<FrameBuffer>(graphics.GetDevice(), 1280, 720);
+        bitBlockTransfer_ = std::make_unique<FullscreenQuad>(graphics.GetDevice());
 
-        HRESULT hr{ S_OK };
-        D3D11_BUFFER_DESC desc{};
-        desc.ByteWidth = sizeof(Shader::SceneConstants);
-        desc.Usage = D3D11_USAGE_DEFAULT;
-        desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        desc.CPUAccessFlags = 0;
-        desc.MiscFlags = 0;
-        desc.StructureByteStride = 0;
-        hr = graphics.GetDevice()->CreateBuffer(&desc, nullptr, shadowConstantBuffer.GetAddressOf());
-        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-    }
+        bloom_ = std::make_unique<Bloom>(graphics.GetDevice(), 1280, 720);
+        CreatePsFromCso(graphics.GetDevice(),
+            "./Resources/Shader/TitleFinalPassPS.cso",
+            bloomPS_.GetAddressOf());
 
-    // 定数バッファー
-    {
-        HRESULT hr{ S_OK };
-
-        D3D11_BUFFER_DESC bufferDesc{};
-        bufferDesc.ByteWidth = sizeof(Shader::SceneConstants);
-        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        bufferDesc.CPUAccessFlags = 0;
-        bufferDesc.MiscFlags = 0;
-        bufferDesc.StructureByteStride = 0;
-        // SceneConstants
-        hr = graphics.GetDevice()->CreateBuffer(&bufferDesc, nullptr,
-            ConstantBuffer.GetAddressOf());
-        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+        CreatePsFromCso(graphics.GetDevice(),
+            "./Resources/Shader/SpriteEmissivePS.cso",
+            spriteEmissivePS_.GetAddressOf());
     }
 }
 
@@ -92,10 +66,61 @@ void SceneTitle::Render()
 
     // 描画の初期設定※必ず呼ぶこと！！！
     BaseScene::RenderInitialize();
+
+    frameBuffer_->Clear(graphics.GetDeviceContext());
+    frameBuffer_->Activate(graphics.GetDeviceContext());
+
+    // ブルーム有 Model
+    {
+
+    }
+
+    // ブルーム有 Sprite
+    {
+        shader->SetDepthStencileState(Shader::DEPTH_STATE::ZT_OFF_ZW_OFF);
+        shader->SetBlendState(Shader::BLEND_STATE::ALPHA);
+        shader->SetRasterizerState(Shader::RASTER_STATE::CULL_NONE);
+
+        pressAnyButtonSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+        LoadGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+        QuitGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+    }
+
+    frameBuffer_->Deactivate(graphics.GetDeviceContext());
+
+    // bloom作成
+    bloom_->Make(graphics.GetDeviceContext(), frameBuffer_->shaderResourceViews[0].Get());
+
+    ID3D11ShaderResourceView* shaderResourceViews[] =
+    {
+        frameBuffer_->shaderResourceViews[0].Get(),
+        bloom_->ShaderResourceView(),
+    };
+
+    // ブルーム有.描画
+    bitBlockTransfer_->Blit(graphics.GetDeviceContext(), shaderResourceViews, 0, _countof(shaderResourceViews), bloomPS_.Get());
+
+    // ブルーム無 Model
+    {
+
+    }
+
+    // ブルーム無 Sprite
+    {
+        titleLogoSprite_->Render();
+    }
 }
 
 
 // デバッグ用
 void SceneTitle::DrawDebug()
 {
+    ImGui::Begin("SceneTitle");
+
+    titleLogoSprite_->DrawDebug();
+    pressAnyButtonSprite_->DrawDebug();
+    LoadGameSprite_->DrawDebug();
+    QuitGameSprite_->DrawDebug();
+
+    ImGui::End();
 }

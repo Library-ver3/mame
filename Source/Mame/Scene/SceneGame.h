@@ -5,6 +5,8 @@
 #include <wrl.h>
 #include <memory>
 
+#include "../Graphics/shader.h"
+
 class SceneGame : public BaseScene
 {
 public: // 基底クラスにある関数
@@ -19,7 +21,7 @@ public: // 基底クラスにある関数
     void DrawDebug()                        override; // ImGui用
 
 private:
-    Microsoft::WRL::ComPtr<ID3D11Buffer> ConstantBuffer_ = nullptr;
+    std::unique_ptr<ConstantBuffer<Shader::SceneConstants>> sceneConstants_;
 
 #ifdef _DEBUG
     bool isDebugCamera = false;

@@ -26,6 +26,10 @@ public:
     void FixedInitialize();         // 固定カメラ初期化
     void FixedSetPerSpectiveFov();  // 固定カメラ用
 
+    // ----- SceneGame用 -----
+    void GameCameraInitialize();
+    void GameCameraSetPerSpectiveFov();
+
     // ----- デバッグカメラ -----
     void DebugSetPerSpectiveFov();
 

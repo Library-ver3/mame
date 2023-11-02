@@ -1,5 +1,5 @@
 // BLOOM
-#include "fullscreen_quad.hlsli"
+#include "FullScreenQuad.hlsli"
 #include "PostEffect.hlsli"
 
 #define POINT 0
@@ -29,7 +29,7 @@ float3 reinhardToneMapping(float3 color)
 }
 
 
-float4 main(VS_OUT psIn) : SV_TARGET
+float4 main(PSIn psIn) : SV_TARGET
 {    
     float4 color = textureMaps[0].Sample(samplerStates[POINT], psIn.texcoord);
     float4 bloom = textureMaps[1].Sample(samplerStates[POINT], psIn.texcoord);

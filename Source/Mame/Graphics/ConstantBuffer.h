@@ -18,7 +18,7 @@
 // --- XV ( Update and Render ) ---
 // constant_->data.parameters = { 1, 0, 0, 0 };
 // constant_->Activate(deviceContext.Get(), 0);
-//
+// 
 
 #define USAGE_DYNAMIC
 

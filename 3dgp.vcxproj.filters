@@ -4,12 +4,6 @@
     <FxCompile Include="Source\Shader\blur_ps.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Source\Shader\fullscreen_quad_ps.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\fullscreen_quad_vs.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
     <FxCompile Include="Source\Shader\geometric_primitive_ps.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
@@ -166,9 +160,6 @@
     <FxCompile Include="Source\Shader\DebugVS.hlsl">
       <Filter>Shader\DebugRenderer</Filter>
     </FxCompile>
-    <FxCompile Include="Source\Shader\SpriteEmissive.hlsl">
-      <Filter>Shader\Sprite</Filter>
-    </FxCompile>
     <FxCompile Include="Source\Shader\EnemyPS.hlsl">
       <Filter>Shader\Fbx</Filter>
     </FxCompile>
@@ -195,6 +186,18 @@
     </FxCompile>
     <FxCompile Include="Source\Shader\homingDokuPS.hlsl">
       <Filter>Shader\Fbx\tama</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\TitleFinalPassPS.hlsl">
+      <Filter>Shader\Scene\Title</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\FullScreenQuadPS.hlsl">
+      <Filter>Shader\FullScreenQuad</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\FullScreenQuadVS.hlsl">
+      <Filter>Shader\FullScreenQuad</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\SpriteEmissivePS.hlsl">
+      <Filter>Shader\Scene\Title</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -514,9 +517,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Source\Shader\fullscreen_quad.hlsli">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Source\Shader\geometric_primitive.hlsli">
       <Filter>Shader</Filter>
     </None>
@@ -573,6 +573,9 @@
     </None>
     <None Include="Source\Shader\Debug.hlsli">
       <Filter>Shader\DebugRenderer</Filter>
+    </None>
+    <None Include="Source\Shader\FullScreenQuad.hlsli">
+      <Filter>Shader\FullScreenQuad</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -686,6 +689,18 @@
     </Filter>
     <Filter Include="Mame\Graphics\ConstantBuffer">
       <UniqueIdentifier>{170c2d79-da4c-4fa7-af28-4a15bbc84374}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Scene">
+      <UniqueIdentifier>{bca06cd6-6ae5-42e8-a1ea-68ba19e895c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Scene\Title">
+      <UniqueIdentifier>{d74603e6-1af0-4b06-b0f0-728491f61cc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Scene\Loading">
+      <UniqueIdentifier>{7341b80f-06e9-4af0-a10b-dfcbf75eeb40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\FullScreenQuad">
+      <UniqueIdentifier>{547befd6-157a-4db5-8f54-9d49374ee078}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

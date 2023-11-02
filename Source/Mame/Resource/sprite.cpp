@@ -113,7 +113,7 @@ void Sprite::UpdateSpriteDissolve(const float& elapsedTime)
 {
     if (isFade_)
     {
-        if (spriteDissolve.GetDissolveType() == 0)
+        if (GetSpriteDissolve()->GetDissolveType() == 0)
         {
             if (FadeIn(elapsedTime))SetIsFade(false);
         }
@@ -124,21 +124,21 @@ void Sprite::UpdateSpriteDissolve(const float& elapsedTime)
     }
 
     // いい感じにFadeになるように設定してる
-    spriteDissolve.SetDissolveValue(spriteDissolve.GetDissolveBlackValue() - spriteDissolve.GetDelay());
+    GetSpriteDissolve()->SetDissolveValue(GetSpriteDissolve()->GetDissolveBlackValue() - GetSpriteDissolve()->GetDelay());
 }
 
 bool Sprite::FadeIn(const float& elapsedTime)
 {
-    spriteDissolve.SubtractDissolveBlackValue(elapsedTime);
+    GetSpriteDissolve()->SubtractDissolveBlackValue(elapsedTime);
 
-    return spriteDissolve.GetDissolveBlackValue() < 0.0f;
+    return GetSpriteDissolve()->GetDissolveBlackValue() < 0.0f;
 }
 
 bool Sprite::FadeOut(const float& elapsedTime)
 {
-    spriteDissolve.AddDissolveBlackValue(elapsedTime);
+    GetSpriteDissolve()->AddDissolveBlackValue(elapsedTime);
 
-    return spriteDissolve.GetDissolveBlackValue() > 2.0f;
+    return GetSpriteDissolve()->GetDissolveBlackValue() > 2.0f;
 }
 
 // アニメーション関数
@@ -155,13 +155,13 @@ void Sprite::PlayAnimation(const float elapsedTime, const float frameSpeed, cons
         animationTime_ = 0.0f;
     }
 
-    DirectX::XMFLOAT2 texPos = spriteTransform.GetTexPos();
-    const DirectX::XMFLOAT2 texSize = spriteTransform.GetTexSize();
+    DirectX::XMFLOAT2 texPos = GetSpriteTransform()->GetTexPos();
+    const DirectX::XMFLOAT2 texSize = GetSpriteTransform()->GetTexSize();
 
     if (animationVertical) texPos.y = texSize.y * animationFrame_;
     else                   texPos.x = texSize.x * animationFrame_;
 
-    spriteTransform.SetTexPos(texPos);
+    GetSpriteTransform()->SetTexPos(texPos);
 }
 
 DirectX::XMFLOAT2 Sprite::ConvertToScreenPos(
@@ -198,13 +198,17 @@ DirectX::XMFLOAT2 Sprite::ConvertToScreenPos(
 }
 
 // 描画
-void Sprite::Render(ID3D11PixelShader* psShader)
+void Sprite::Render(ID3D11PixelShader* psShader, const char* type)
 {
     Graphics& graphics = Graphics::Instance();
     Shader* shader = graphics.GetShader();
-
-    shader->SetRasterizerState(Shader::RASTER_STATE::CULL_NONE);
-    shader->SetDepthStencileState(Shader::DEPTH_STATE::ZT_OFF_ZW_OFF);
+    
+    if (type == "Emissive")
+    {
+        shader->SetEmissiveColor(GetEmissive()->GetEmissiveColor());
+        shader->SetEmissiveIntensity(GetEmissive()->GetEmissiveIntensity());
+        shader->UpdateEmissiveConstants(6);
+    }
 
     // spriteDissolve
         NoiseTexture::Instance().SetConstantBuffers(1);
@@ -212,10 +216,10 @@ void Sprite::Render(ID3D11PixelShader* psShader)
     // 定数バッファの更新
     {
         DissolveConstants dissolve{};
-        dissolve.parameters.x = spriteDissolve.GetDissolveValue();
-        dissolve.parameters.y = spriteDissolve.GetDissolveBlackValue();
-        dissolve.parameters.z = spriteDissolve.GetEdgeThreshold();
-        dissolve.edgeColor = spriteDissolve.GetEdgeColor();
+        dissolve.parameters.x = GetSpriteDissolve()->GetDissolveValue();
+        dissolve.parameters.y = GetSpriteDissolve()->GetDissolveBlackValue();
+        dissolve.parameters.z = GetSpriteDissolve()->GetEdgeThreshold();
+        dissolve.edgeColor = GetSpriteDissolve()->GetEdgeColor();
         graphics.GetDeviceContext()->UpdateSubresource(dissolveConstantBuffer.Get(), 0, 0, &dissolve, 0, 0);
         graphics.GetDeviceContext()->VSSetConstantBuffers(3, 1, dissolveConstantBuffer.GetAddressOf());
         graphics.GetDeviceContext()->PSSetConstantBuffers(3, 1, dissolveConstantBuffer.GetAddressOf());
@@ -320,7 +324,6 @@ void Sprite::Render(ID3D11DeviceContext* deviceContext, ID3D11PixelShader* psSha
 
     deviceContext->VSSetShader(vertexShader.Get(), nullptr, 0);
     psShader ? deviceContext->PSSetShader(psShader, nullptr, 0) : deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
-    deviceContext->PSSetShader(pixelShader.Get(), nullptr, 0);
 
     deviceContext->PSSetShaderResources(0, 1, shaderResourceView.GetAddressOf());
 
@@ -333,9 +336,11 @@ void Sprite::DrawDebug()
 {
     if (ImGui::BeginMenu(GetName()))
     {
-        spriteTransform.DrawDebug();
+        GetSpriteTransform()->DrawDebug();
 
-        spriteDissolve.DrawDebug();
+        GetSpriteDissolve()->DrawDebug();
+
+        GetEmissive()->DrawDebug();
 
         ImGui::DragFloat("animationFrame", &animationFrame_);
 
@@ -372,6 +377,17 @@ void Sprite::SpriteDissolve::DrawDebug()
         ImGui::ColorEdit4("edgeColor", &edgeColor.x);
         ImGui::SliderFloat("delay", &delay, 0.0f, 1.0f);
         ImGui::SliderInt("dissolveType", &dissolveType, 0, 1);
+        ImGui::TreePop();
+    }
+}
+
+void Sprite::Emissive::DrawDebug()
+{
+    if (ImGui::TreeNode("Emissive"))
+    {
+        ImGui::ColorEdit4("emissiveColor", &emissiveColor_.x);
+        ImGui::DragFloat("emissiveIntensity", &emissiveIntensity_);
+
         ImGui::TreePop();
     }
 }

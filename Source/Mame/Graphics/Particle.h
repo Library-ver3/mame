@@ -5,7 +5,7 @@
 #include <DirectXMath.h>
 
 #include <vector>
-#include "../Resource/SkinnedMesh.h"
+#include "../Resource/Model.h"
 
 #define NUMTHREADS_X 16
 

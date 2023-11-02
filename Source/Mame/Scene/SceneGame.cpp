@@ -7,6 +7,8 @@
 #include "../Game/Stage/StageManager.h"
 #include "../Game/Stage/StageWall.h"
 
+#include "../Game/Character/PlayerManager.h"
+
 // リソース生成
 void SceneGame::CreateResource()
 {
@@ -15,25 +17,16 @@ void SceneGame::CreateResource()
     StageManager::Instance().Register(new StageWall(
         "./Resources/Model/Stage/StageBase"));
 
-    // 定数バッファー
-    HRESULT hr{ S_OK };
-    D3D11_BUFFER_DESC bufferDesc{};
+    PlayerManager::Instance().GetPlayer() = std::make_unique<Player>();
 
-    bufferDesc.ByteWidth = sizeof(Shader::SceneConstants);
-    bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    bufferDesc.CPUAccessFlags = 0;
-    bufferDesc.MiscFlags = 0;
-    bufferDesc.StructureByteStride = 0;
-    // SceneConstants
-    hr = graphics.GetDevice()->CreateBuffer(&bufferDesc, nullptr,
-        ConstantBuffer_.GetAddressOf());
-    _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
+    // SceneConstant
+    sceneConstants_ = std::make_unique<ConstantBuffer<Shader::SceneConstants>>(graphics.GetDevice());
 }
 
 // 初期化
 void SceneGame::Initialize()
 {
+    Camera::Instance().GameCameraInitialize();
 }
 
 // 終了化
@@ -77,26 +70,28 @@ void SceneGame::Render()
     Graphics& graphics = Graphics::Instance();
     Shader* shader = graphics.GetShader();
 
-    Shader::SceneConstants sceneConstants{};
-
     Camera& camera = Camera::Instance();
 
-    camera.DebugSetPerSpectiveFov();
+    camera.GameCameraSetPerSpectiveFov();
     //camera.FixedSetPerSpectiveFov();
-    DirectX::XMStoreFloat4x4(&sceneConstants.viewProjection, camera.GetViewMatrix() * camera.GetProjectionMatrix());
-    sceneConstants.lightDirection = shader->GetViewPosition();
-    sceneConstants.cameraPosition = shader->GetViewCamera();
+    DirectX::XMStoreFloat4x4(&sceneConstants_->data.viewProjection, camera.GetViewMatrix() * camera.GetProjectionMatrix());
+    sceneConstants_->data.lightDirection = shader->GetViewPosition();
+    sceneConstants_->data.cameraPosition = shader->GetViewCamera();
 
-    DirectX::XMStoreFloat4x4(&sceneConstants.inverseProjection, DirectX::XMMatrixInverse(NULL, camera.GetProjectionMatrix()));
-    DirectX::XMStoreFloat4x4(&sceneConstants.inverseViewProjection, DirectX::XMMatrixInverse(NULL, camera.GetViewMatrix() * camera.GetProjectionMatrix()));
-    sceneConstants.time = framework::tictoc.time_stamp();
+    DirectX::XMStoreFloat4x4(&sceneConstants_->data.inverseProjection, DirectX::XMMatrixInverse(NULL, camera.GetProjectionMatrix()));
+    DirectX::XMStoreFloat4x4(&sceneConstants_->data.inverseViewProjection, DirectX::XMMatrixInverse(NULL, camera.GetViewMatrix() * camera.GetProjectionMatrix()));
+    sceneConstants_->data.time = framework::tictoc.time_stamp();
 
-    graphics.GetDeviceContext()->UpdateSubresource(ConstantBuffer_.Get(), 0, 0, &sceneConstants, 0, 0);
-    graphics.GetDeviceContext()->VSSetConstantBuffers(1, 1, ConstantBuffer_.GetAddressOf());
-    graphics.GetDeviceContext()->PSSetConstantBuffers(1, 1, ConstantBuffer_.GetAddressOf());
+    sceneConstants_->Activate(graphics.GetDeviceContext(), 1);
 
-    // ステージ
-    StageManager::Instance().Render();
+    // 3Dモデル描画
+    {
+        // ステージ
+        StageManager::Instance().Render();
+
+        // player
+        PlayerManager::Instance().Render();
+    }
 }
 
 // ImGui

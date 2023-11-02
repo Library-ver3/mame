@@ -4,9 +4,9 @@
 
 FullscreenQuad::FullscreenQuad(ID3D11Device* device)
 {
-    CreateVsFromCso(device, "./resources/Shader/fullscreen_quad_vs.cso", embeddedVertexShader.ReleaseAndGetAddressOf(),
+    CreateVsFromCso(device, "./Resources/Shader/FullScreenQuadVS.cso", embeddedVertexShader.ReleaseAndGetAddressOf(),
         nullptr, nullptr, 0);
-    CreatePsFromCso(device, "./resources/Shader/fullscreen_quad_ps.cso", embeddedPixelShader.ReleaseAndGetAddressOf());
+    CreatePsFromCso(device, "./Resources/Shader/FullScreenQuadPS.cso", embeddedPixelShader.ReleaseAndGetAddressOf());
 }
 
 void FullscreenQuad::Blit(ID3D11DeviceContext* deviceContext,

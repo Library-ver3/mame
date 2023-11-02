@@ -32,6 +32,35 @@ void Camera::FixedSetPerSpectiveFov()
     V = { DirectX::XMMatrixLookAtLH(eye, focus, up) };
 }
 
+// SceneGame—p
+void Camera::GameCameraInitialize()
+{
+    transform.SetPosition(DirectX::XMFLOAT3(0.0f, 25.0f, 100.0f));
+    transform.SetScale(DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));
+    transform.SetRotation(DirectX::XMFLOAT4(0.0f, DirectX::XMConvertToRadians(180), 0.0f, 0.0f));
+}
+
+// SceneGame—p
+void Camera::GameCameraSetPerSpectiveFov()
+{
+    D3D11_VIEWPORT viewport{};
+    UINT unm_viewports{ 1 };
+    Graphics::Instance().GetDeviceContext()->RSGetViewports(&unm_viewports, &viewport);
+
+    float aspect_ratio{ viewport.Width / viewport.Height };
+    P = { DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(30),aspect_ratio,0.1f,1000.0f) };
+
+    DirectX::XMVECTOR eye;
+    DirectX::XMVECTOR focus;
+
+    DirectX::XMFLOAT3 pos = transform.GetPosition();
+    DirectX::XMFLOAT3 forward = transform.CalcForward();
+    eye = { DirectX::XMVectorSet(pos.x, pos.y, pos.z, 1.0f) };
+    focus = { DirectX::XMVectorSet(pos.x + forward.x, pos.y + forward.y, pos.z + forward.z, 1.0f) };
+    DirectX::XMVECTOR up{ DirectX::XMVectorSet(camera.up.x,camera.up.y,camera.up.z,0.0f) };
+    V = { DirectX::XMMatrixLookAtLH(eye, focus, up) };
+}
+
 void Camera::DebugSetPerSpectiveFov()
 {
     D3D11_VIEWPORT viewport{};

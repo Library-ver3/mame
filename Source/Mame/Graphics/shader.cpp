@@ -6,12 +6,13 @@
 
 #include "../Other/misc.h"
 
-#include "../Resource/SkinnedMesh.h"
+#include "../Resource/Model.h"
 
 #include "Graphics.h"
 
 #include "../Core/framework.h"
 
+// 頂点シェーダー ( VertexShader )
 HRESULT CreateVsFromCso(ID3D11Device* device, const char* cso_name, ID3D11VertexShader** vertex_shader,
     ID3D11InputLayout** input_layout, D3D11_INPUT_ELEMENT_DESC* input_element_desc, UINT num_elements)
 {
@@ -41,6 +42,7 @@ HRESULT CreateVsFromCso(ID3D11Device* device, const char* cso_name, ID3D11Vertex
     return hr;
 }
 
+// ピクセルシェーダー ( PixelShader )
 HRESULT CreatePsFromCso(ID3D11Device* device, const char* cso_name, ID3D11PixelShader** pixel_shader)
 {
     FILE* fp{ nullptr };
@@ -62,6 +64,7 @@ HRESULT CreatePsFromCso(ID3D11Device* device, const char* cso_name, ID3D11PixelS
     return hr;
 }
 
+// ジオメトリシェーダー ( GeometryShader )
 HRESULT CreateGsFromCso(ID3D11Device* device, const char* csoName, ID3D11GeometryShader** geometryShader)
 {
     FILE* fp = nullptr;
@@ -82,6 +85,7 @@ HRESULT CreateGsFromCso(ID3D11Device* device, const char* csoName, ID3D11Geometr
     return hr;
 }
 
+// コンピュートシェーダー ( ComputeShader )
 HRESULT CreateCsFromCso(ID3D11Device* device, const char* csoName, ID3D11ComputeShader** computeShader)
 {
     FILE* fp = nullptr;
@@ -102,6 +106,7 @@ HRESULT CreateCsFromCso(ID3D11Device* device, const char* csoName, ID3D11Compute
     return hr;
 }
 
+// ドメインシェーダー ( DomainShader )
 HRESULT CreateDsFromCso(ID3D11Device* device, const char* csoName, ID3D11DomainShader** domainShader)
 {
     FILE* fp = nullptr;
@@ -122,6 +127,7 @@ HRESULT CreateDsFromCso(ID3D11Device* device, const char* csoName, ID3D11DomainS
     return hr;
 }
 
+// ハルシェーダー ( HullShader )
 HRESULT CreateHsFromCso(ID3D11Device* device, const char* csoName, ID3D11HullShader** hullShader)
 {
     FILE* fp = nullptr;
@@ -142,49 +148,23 @@ HRESULT CreateHsFromCso(ID3D11Device* device, const char* csoName, ID3D11HullSha
     return hr;
 }
 
+// コンストラクタ　
 Shader::Shader(ID3D11Device* device)
 {
     // 定数バッファ
     {
-        HRESULT hr{ S_OK };
-
-        D3D11_BUFFER_DESC bufferDesc{};
-
-        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        bufferDesc.CPUAccessFlags = 0;
-        bufferDesc.MiscFlags = 0;
-        bufferDesc.StructureByteStride = 0;
-
-
-
-        bufferDesc.ByteWidth = sizeof(CBParametric);
-        // CBParametric
-        hr = device->CreateBuffer(&bufferDesc, nullptr,
-            ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::CONSTANT_BUFFER_PARAMETRIC)].GetAddressOf());
-        _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
-
-
-        // POINT_LIGHT
-        bufferDesc.ByteWidth = sizeof(LightConstants);
-        // LightConstants
-        hr = device->CreateBuffer(&bufferDesc, nullptr,
-            ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::LIGHT_CONSTANT)].GetAddressOf());
-
-
-
-        // FOG
-        bufferDesc.ByteWidth = sizeof(FogConstants);
-        hr = device->CreateBuffer(&bufferDesc, nullptr,
-            ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::FOG_CONSTANT)].GetAddressOf());
+        // fog
+        fogConstants_ = std::make_unique<ConstantBuffer<FogConstants>>(device);
 
         // PostEffect
-        bufferDesc.ByteWidth = sizeof(PostEffectConstants);
-        hr = device->CreateBuffer(&bufferDesc, nullptr,
-            ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::POST_EFFECT_CONSTANT)].GetAddressOf());
+        postEffectConstants_ = std::make_unique<ConstantBuffer<PostEffectConstants>>(device);
+
+        // emissive
+        emissiveConstants_ = std::make_unique<ConstantBuffer<EmissiceConstants>>(device);
     }
 
     // ブレンドステート
+#pragma region BlendState
     {
         HRESULT hr{ S_OK };
 
@@ -241,8 +221,10 @@ Shader::Shader(ID3D11Device* device)
         hr = device->CreateBlendState(&desc, blendStates[static_cast<size_t>(BLEND_STATE::MULTIPLY)].GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
     }
+#pragma endregion// BlendState
 
     // 深度ステンシルステート
+#pragma region DepthStencilState
     {
         HRESULT hr{ S_OK };
 
@@ -272,8 +254,10 @@ Shader::Shader(ID3D11Device* device)
         hr = device->CreateDepthStencilState(&desc, depthStencilStates[3].GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
     }
+#pragma endregion// DepthStencilState
 
     // ラスタライザーステート
+#pragma region RasterRizerState
     {
         HRESULT hr{ S_OK };
 
@@ -309,8 +293,10 @@ Shader::Shader(ID3D11Device* device)
         hr = device->CreateRasterizerState(&desc, rasterizerStates[static_cast<size_t>(RASTER_STATE::WIREFRAME_CULL_NONE)].GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
     }
+#pragma endregion// RasterRizerState
 
     // サンプラステート
+#pragma region SamplerState
     {
         HRESULT hr{ S_OK };
 
@@ -413,6 +399,7 @@ Shader::Shader(ID3D11Device* device)
         hr = device->CreateSamplerState(&desc, samplerState[static_cast<size_t>(SAMPLER_STATE::POINT_CLAMP)].GetAddressOf());
         _ASSERT_EXPR(SUCCEEDED(hr), hr_trace(hr));
     }
+#pragma endregion// SamplerState
 
     // LightConstants
     {
@@ -480,50 +467,6 @@ Shader::Shader(ID3D11Device* device)
     }
 }
 
-void Shader::Initialize()
-{
-    Camera& camera = Camera::Instance();
-    camera.Initialize();
-}
-
-void Shader::Begin(ID3D11DeviceContext* deviceContext)
-{
-    deviceContext->OMSetDepthStencilState(depthStencilStates[0].Get(), 1);
-
-    deviceContext->OMSetBlendState(blendStates[0].Get(), nullptr, 0xFFFFFFFF);
-
-    deviceContext->RSSetState(rasterizerStates[0].Get());
-
-    
-    //scene.lightViewProjection = {}
-
-
-
-    // POINT_LIGHT
-    {
-        deviceContext->UpdateSubresource(ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::LIGHT_CONSTANT)].Get(), 0, 0, &lightConstant, 0, 0);
-        deviceContext->VSSetConstantBuffers(5, 1, ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::LIGHT_CONSTANT)].GetAddressOf());
-        deviceContext->PSSetConstantBuffers(5, 1, ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::LIGHT_CONSTANT)].GetAddressOf());
-
-#ifdef _DEBUG
-#if POINT_LIGHT_ONE
-        DirectX::XMFLOAT3 ptPos = { lightConstant.pointLight.position.x, lightConstant.pointLight.position.y, lightConstant.pointLight.position.z };
-
-#endif// POINT_LIGHT_ONE
-#endif// _DEBUG
-    }
-
-
-#ifdef USE_IMGUI
-    //DrawDebug();
-#endif
-
-        // ZELDA
-    //deviceContext->GSSetConstantBuffers(1, 1, ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::SCENE_CONSTANT)].GetAddressOf());
-}
-
-
-
 
 void Shader::DrawDebug()
 {
@@ -549,23 +492,23 @@ void Shader::DrawDebug()
     ImGui::End();
 
     // テスト用
-    postEffectConstants.noiseTimer = framework::tictoc.time_stamp();
-    postEffectConstants.scanLineTimer = framework::tictoc.time_stamp();
+    postEffectConstants_->data.noiseTimer = framework::tictoc.time_stamp();
+    postEffectConstants_->data.scanLineTimer = framework::tictoc.time_stamp();
 
     if (ImGui::TreeNode("postEffect"))
     {
-        ImGui::DragFloat4("shiftSize", &postEffectConstants.shiftSize.x);
-        ImGui::ColorEdit4("noiseColor", &postEffectConstants.noiseColor.x);
-        ImGui::DragFloat("noiseTimer", &postEffectConstants.noiseTimer);
-        ImGui::DragFloat("scanTimer", &postEffectConstants.scanLineTimer);
+        ImGui::DragFloat4("shiftSize", &postEffectConstants_->data.shiftSize.x);
+        ImGui::ColorEdit4("noiseColor", &postEffectConstants_->data.noiseColor.x);
+        ImGui::DragFloat("noiseTimer", &postEffectConstants_->data.noiseTimer);
+        ImGui::DragFloat("scanTimer", &postEffectConstants_->data.scanLineTimer);
 
         //ImGui::DragFloat("boekhAperture", &postEffectConstants.bokehAperture);
         //ImGui::DragFloat("bokehFocus", &postEffectConstants.bokehFocus);
 
-        ImGui::DragFloat("bokeh_aperture", &postEffectConstants.bokehAperture, 0.001f, 0.0f, 1.0f, "%.3f");
-        ImGui::DragFloat("bokeh_focus", &postEffectConstants.bokehFocus, 0.001f, 0.0f, 1.0f, "%.3f");
+        ImGui::DragFloat("bokeh_aperture", &postEffectConstants_->data.bokehAperture, 0.001f, 0.0f, 1.0f, "%.3f");
+        ImGui::DragFloat("bokeh_focus", &postEffectConstants_->data.bokehFocus, 0.001f, 0.0f, 1.0f, "%.3f");
 
-        ImGui::SliderFloat("vignetteValue", &postEffectConstants.vignetteValue, 0.0f, 1.0f);
+        ImGui::SliderFloat("vignetteValue", &postEffectConstants_->data.vignetteValue, 0.0f, 1.0f);
 
         ImGui::TreePop();
     }
@@ -625,16 +568,16 @@ void Shader::DrawDebug()
 
         if (ImGui::TreeNode("Fog"))
         {
-            ImGui::ColorEdit4("fogColor", &fogConstants.fogColor.x);
-            ImGui::DragFloat("fogDensity", &fogConstants.fogDensity);
+            ImGui::ColorEdit4("fogColor", &fogConstants_->data.fogColor.x);
+            ImGui::DragFloat("fogDensity", &fogConstants_->data.fogDensity);
             //ImGui::SliderFloat("fogDensity", &fogConstants.fogDensity, 0.0f, 10.0f, "%.4f");
-            ImGui::DragFloat("fogHeightFalloff", &fogConstants.fogHeightFalloff);
+            ImGui::DragFloat("fogHeightFalloff", &fogConstants_->data.fogHeightFalloff);
             //ImGui::SliderFloat("fogHeightFalloff", &fogConstants.fogHeightFalloff, 0.0001f, 10.0f, "%.4f");
-            ImGui::SliderFloat("fogCutoffDistance", &fogConstants.fogCutoffDistance, 0.0f, 1000.0f, "%.4f");
-            ImGui::SliderFloat("startDistance", &fogConstants.startDistance, 0.0f, 100.0f, "%.4f");
+            ImGui::SliderFloat("fogCutoffDistance", &fogConstants_->data.fogCutoffDistance, 0.0f, 1000.0f, "%.4f");
+            ImGui::SliderFloat("startDistance", &fogConstants_->data.startDistance, 0.0f, 100.0f, "%.4f");
 
-            ImGui::SliderFloat("timeScale", &fogConstants.timeScale, 0.0f, 10.0f, "%.4f");
-            ImGui::SliderFloat("speedScale", &fogConstants.speedScale, 0.0f, 0.5f, "%.4f");
+            ImGui::SliderFloat("timeScale", &fogConstants_->data.timeScale, 0.0f, 10.0f, "%.4f");
+            ImGui::SliderFloat("speedScale", &fogConstants_->data.speedScale, 0.0f, 0.5f, "%.4f");
             ImGui::TreePop();
         }
 
@@ -643,23 +586,21 @@ void Shader::DrawDebug()
     }
 }
 
-// POST_EFFECT
 void Shader::UpdatePostEffectConstants(int slot)
-{
-    Graphics& graphics = Graphics::Instance();
-
-    graphics.GetDeviceContext()->UpdateSubresource(ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::POST_EFFECT_CONSTANT)].Get(), 0, 0, &postEffectConstants, 0, 0);
-    graphics.GetDeviceContext()->PSSetConstantBuffers(slot, 1, ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::POST_EFFECT_CONSTANT)].GetAddressOf());
+{   // PostEffect
+    postEffectConstants_->Activate(Graphics::Instance().GetDeviceContext(), slot, false, true);
 }
 
-// FOG
 void Shader::UpdateFogConstants(int slot)
-{
-    Graphics& graphics = Graphics::Instance();
-
-    graphics.GetDeviceContext()->UpdateSubresource(ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::FOG_CONSTANT)].Get(), 0, 0, &fogConstants, 0, 0);
-    graphics.GetDeviceContext()->PSSetConstantBuffers(2, 1, ConstantBuffer[static_cast<UINT>(CONSTANT_BUFFER::FOG_CONSTANT)].GetAddressOf());
+{   // Fog
+    fogConstants_->Activate(Graphics::Instance().GetDeviceContext(), slot, false, true);
 }
+
+void Shader::UpdateEmissiveConstants(int slot)
+{   // emissive
+    emissiveConstants_->Activate(Graphics::Instance().GetDeviceContext(), slot, false, true);
+}
+
 
 void Shader::SetDepthStencileState(DEPTH_STATE depthStencileState)
 {

@@ -46,8 +46,8 @@ bool framework::initialize()
 
     // シーン
     Mame::Scene::SceneManager::Instance().Initialize();
-    //Mame::Scene::SceneManager::Instance().ChangeScene(new SceneTitle);
-    Mame::Scene::SceneManager::Instance().ChangeScene(new SceneGame);
+    Mame::Scene::SceneManager::Instance().ChangeScene(new SceneTitle);
+    //Mame::Scene::SceneManager::Instance().ChangeScene(new SceneGame);
     
 #ifndef _DEBUG
     ShowCursor(!FULLSCREEN);	// フルスクリーン時はカーソルを消す

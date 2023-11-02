@@ -150,7 +150,22 @@ public:
         float GetDelay() { return delay; }
         int GetDissolveType() { return dissolveType; }
     };
-public:
+
+    struct Emissive
+    {
+    private:
+        DirectX::XMFLOAT4 emissiveColor_ = { 1.0f, 1.0f, 1.0f,1.0f };
+        float emissiveIntensity_ = 2.0f;
+    public:
+        void DrawDebug();
+
+        void SetEmissiveColor(DirectX::XMFLOAT4 color) { emissiveColor_ = color; }
+        DirectX::XMFLOAT4 GetEmissiveColor() { return emissiveColor_; }
+
+        void SetEmissiveIntensity(float intensity) { emissiveIntensity_ = intensity; }
+        float GetEmissiveIntensity() { return emissiveIntensity_; }
+    };
+public:    
     void Initialize();
 
     void Update(const float& elapsedTime);
@@ -176,12 +191,13 @@ public:
     //ワールド座標からスクリーン座標に変更後描画
     static DirectX::XMFLOAT2 ConvertToScreenPos(const DirectX::XMFLOAT3 worldPos, bool* isDraw = nullptr); // isDraw：描画するか
 
-    void Render(ID3D11PixelShader* psShader = nullptr);
+    void Render(ID3D11PixelShader* psShader = nullptr, const char* type = "");
 
     void DrawDebug();
 
-    SpriteTransform* GetSpriteTransform() { return &spriteTransform; }
-    SpriteDissolve* GetSpriteDissolve() { return &spriteDissolve; }
+    SpriteTransform* GetSpriteTransform() { return &spriteTransform_; }
+    SpriteDissolve* GetSpriteDissolve() { return &spriteDissolve_; }
+    Emissive* GetEmissive() { return &emissive_; }
 
     void SetIsFade(bool fade) { isFade_ = fade; }
     bool GetIsFade() { return isFade_; }
@@ -190,8 +206,9 @@ private:// 内部処理だけで完結する関数
     void Render(ID3D11DeviceContext* deviceContext, ID3D11PixelShader* psShader);
 
 private:// 変数等々
-    SpriteTransform spriteTransform;    // Transform
-    SpriteDissolve spriteDissolve;      // Dissolve
+    SpriteTransform spriteTransform_;   // Transform
+    SpriteDissolve spriteDissolve_;     // Dissolve
+    Emissive emissive_;                 // Emissive
 
     // Animation
     float animationTime_ = 0.0f;

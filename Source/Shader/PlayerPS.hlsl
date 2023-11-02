@@ -14,6 +14,8 @@ float4 main(PSIn psIn) : SV_TARGET
     float4 color = textureMaps[0].Sample(samplerStates[POINT], psIn.texcoord) * psIn.color;
     float alpha = color.a;
     
+    return color;
+    
     float maskValue = maskTexture.Sample(samplerStates[POINT], psIn.texcoord).r;
     
     // ÉKÉìÉ}ï‚ê≥

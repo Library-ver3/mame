@@ -1,5 +1,5 @@
 // FOG
-#include "fullscreen_quad.hlsli"
+#include "FullScreenQuad.hlsli"
 // NOISE
 #include "Noise.hlsli"
 
@@ -44,7 +44,7 @@ float FogDensityDistribution(float3 d /*ray path*/, float3 o /*camera position*/
     return max(0.0, 1.0 - exp(-f));
 }
 
-float4 main(VS_OUT psIn) : SV_TARGET
+float4 main(PSIn psIn) : SV_TARGET
 {
     float depth = textureMaps[0].Sample(samplerStates[LINEAR_BORDER_BLACK], psIn.texcoord).x;
     

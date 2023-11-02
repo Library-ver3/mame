@@ -1,4 +1,4 @@
-#include "fullscreen_quad.hlsli"
+#include "FullScreenQuad.hlsli"
 
 float2 hash(float2 p)
 {
@@ -65,7 +65,7 @@ float2 rotate2D(float2 _st, float _angle)
     _st = mul(_st, float2x2(cos(_angle), -sin(_angle), sin(_angle), cos(_angle)));
     return _st;
 }
-float4 main(VS_OUT pin) : SV_TARGET
+float4 main(PSIn pin) : SV_TARGET
 {
     const float time = params.x * 0.8;
 
