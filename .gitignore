@@ -1,0 +1,8 @@
+3dgp.aps
+.vs/
+External/
+Release/
+Resources/
+x64/
+tinygltf-release/
+3dgp.vcxproj.user
