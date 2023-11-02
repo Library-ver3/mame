@@ -155,7 +155,7 @@ public:
     {
     private:
         DirectX::XMFLOAT4 emissiveColor_ = { 1.0f, 1.0f, 1.0f,1.0f };
-        float emissiveIntensity_ = 2.0f;
+        float emissiveIntensity_ = 1.0f;
     public:
         void DrawDebug();
 

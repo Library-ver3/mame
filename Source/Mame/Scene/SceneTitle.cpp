@@ -3,7 +3,11 @@
 #include "../Graphics/Graphics.h"
 #include "../Graphics/shader.h"
 
+#include "../Input/Input.h"
+
 #include "../Other/Easing.h"
+
+#include "SceneTitleState.h"
 
 // リソース生成
 void SceneTitle::CreateResource()
@@ -36,12 +40,40 @@ void SceneTitle::CreateResource()
             "./Resources/Shader/SpriteEmissivePS.cso",
             spriteEmissivePS_.GetAddressOf());
     }
+
+    // ステートマシン
+    {
+        stateMachine_.reset(new StateMachine<State<SceneTitle>>);
+
+        GetStateMachine()->RegisterState(new SceneTitleState::PressAnyButtonState(this));
+        GetStateMachine()->RegisterState(new SceneTitleState::PressAnyButtonFadeOutState(this));
+        GetStateMachine()->RegisterState(new SceneTitleState::SelectFadeInState(this));
+        GetStateMachine()->RegisterState(new SceneTitleState::SelectState(this));
+
+        GetStateMachine()->SetState(static_cast<UINT>(STATE::PressAnyButton));
+    }
 }
 
 // 初期化
 void SceneTitle::Initialize()
 {
-   
+#pragma region PressAnyButtonSprite_
+    pressAnyButtonSprite_->GetSpriteTransform()->SetPos(DirectX::XMFLOAT2(480, 450));
+    pressAnyButtonSprite_->GetSpriteTransform()->SetSize(DirectX::XMFLOAT2(300, 50));
+    pressAnyButtonSprite_->GetSpriteTransform()->SetColorA(1.0f);
+#pragma endregion// PressAnyButtonSprite_
+
+#pragma region LoadGame
+    LoadGameSprite_->GetSpriteTransform()->SetPos(DirectX::XMFLOAT2(475, 420));
+    LoadGameSprite_->GetSpriteTransform()->SetSize(DirectX::XMFLOAT2(300, 50));
+    LoadGameSprite_->GetSpriteTransform()->SetColorA(1.0f);
+#pragma endregion
+
+#pragma region QuitGame
+    QuitGameSprite_->GetSpriteTransform()->SetPos(DirectX::XMFLOAT2(475, 480));
+    QuitGameSprite_->GetSpriteTransform()->SetSize(DirectX::XMFLOAT2(300, 50));
+    QuitGameSprite_->GetSpriteTransform()->SetColorA(1.0f);
+#pragma endregion
 }
 
 // 終了化
@@ -53,6 +85,8 @@ void SceneTitle::Finalize()
 // 更新処理
 void SceneTitle::Update(const float& elapsedTime)
 {
+    // ステートマシン更新
+    GetStateMachine()->Update(elapsedTime);
 }
 
 
@@ -81,9 +115,24 @@ void SceneTitle::Render()
         shader->SetBlendState(Shader::BLEND_STATE::ALPHA);
         shader->SetRasterizerState(Shader::RASTER_STATE::CULL_NONE);
 
-        pressAnyButtonSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
-        LoadGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
-        QuitGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+        switch (currentState_)
+        {
+        case static_cast<UINT>(STATE::PressAnyButton):
+            pressAnyButtonSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            break;
+        case static_cast<UINT>(STATE::PressAnyButtonFadeOut):
+            pressAnyButtonSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            break;
+        case static_cast<UINT>(STATE::SelectFadeIn):
+            LoadGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            QuitGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            break;
+        case static_cast<UINT>(STATE::Select):
+            LoadGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            QuitGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            break;
+        }
+
     }
 
     frameBuffer_->Deactivate(graphics.GetDeviceContext());

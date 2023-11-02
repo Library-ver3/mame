@@ -282,9 +282,6 @@
     <ClCompile Include="Source\Mame\Scene\SceneManager.cpp">
       <Filter>Mame\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Mame\Scene\SceneTitle.cpp">
-      <Filter>Mame\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Mame\Other\Transform.cpp">
       <Filter>Mame\Other</Filter>
     </ClCompile>
@@ -345,6 +342,12 @@
     </ClCompile>
     <ClCompile Include="Source\Mame\Game\Character\Character.cpp">
       <Filter>Mame\Game\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Scene\SceneTitle.cpp">
+      <Filter>Mame\Scene\SceneTitle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Scene\SceneTitleState.cpp">
+      <Filter>Mame\Scene\SceneTitle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -430,9 +433,6 @@
     <ClInclude Include="Source\Mame\Scene\SceneManager.h">
       <Filter>Mame\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Mame\Scene\SceneTitle.h">
-      <Filter>Mame\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Mame\Other\Easing.h">
       <Filter>Mame\Other</Filter>
     </ClInclude>
@@ -514,6 +514,12 @@
     </ClInclude>
     <ClInclude Include="Source\Mame\Graphics\ConstantBuffer.h">
       <Filter>Mame\Graphics\ConstantBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Scene\SceneTitle.h">
+      <Filter>Mame\Scene\SceneTitle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Scene\SceneTitleState.h">
+      <Filter>Mame\Scene\SceneTitle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -701,6 +707,9 @@
     </Filter>
     <Filter Include="Shader\FullScreenQuad">
       <UniqueIdentifier>{547befd6-157a-4db5-8f54-9d49374ee078}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mame\Scene\SceneTitle">
+      <UniqueIdentifier>{7b642775-ba46-4090-bf7b-0cefd1eee050}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -240,6 +240,7 @@
     <ClCompile Include="Source\Mame\Scene\SceneLoading.cpp" />
     <ClCompile Include="Source\Mame\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Mame\Scene\SceneTitle.cpp" />
+    <ClCompile Include="Source\Mame\Scene\SceneTitleState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui\imconfig.h" />
@@ -298,6 +299,7 @@
     <ClInclude Include="Source\Mame\Scene\SceneLoading.h" />
     <ClInclude Include="Source\Mame\Scene\SceneManager.h" />
     <ClInclude Include="Source\Mame\Scene\SceneTitle.h" />
+    <ClInclude Include="Source\Mame\Scene\SceneTitleState.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shader\phongShaderPS.hlsl">
