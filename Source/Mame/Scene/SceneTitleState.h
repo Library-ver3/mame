@@ -57,8 +57,50 @@ namespace SceneTitleState
         void Update(const float& elapsedTime)   override;
         void Finalize()                         override;
 
+        void UpdateState(const float& elapsedTime);
+        float UpdateBrightness(const float& elapsedTime, const char* who);
+
+    private:// 定数
+        enum class STATE
+        {
+            LoadGame,
+            QuitGame,
+        };
+
     private:
         float easingTimer_ = 0.0f;
+        int currentState_ = static_cast<UINT>(STATE::LoadGame);
+        bool isBrightnessUp_ = false;
+
+        // ----- ステート切り替え用 -----
+        bool isChangeState_ = false; 
+        float breakTimer_ = 0.0f;
+    };
+
+    class QuitGameChoseState : public State<SceneTitle>
+    {
+    public:
+        QuitGameChoseState(SceneTitle* sceneTitle) : State(sceneTitle, "QuitGameChoseState") {}
+        ~QuitGameChoseState() {}
+
+        void Initialize()                       override;
+        void Update(const float& elapsedTime)   override;
+        void Finalize()                         override;
+
+    private:
+        enum class STATE
+        {
+            Yes,
+            No,
+        };
+
+    private:
+        bool isChose_ = false;
+        bool isPlayAnimation_ = false;
+        bool isButtonPush = false;
+        int currentState_ = 0;
+        float easingTimer_ = 0.0f;
+        float animationTimer_ = 0.0f;
     };
 }
 

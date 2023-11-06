@@ -4,16 +4,7 @@
     <FxCompile Include="Source\Shader\blur_ps.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Source\Shader\geometric_primitive_ps.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\geometric_primitive_vs.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
     <FxCompile Include="Source\Shader\luminance_extraction_ps.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\sprite_change_ps.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\static_mesh_ps.hlsl">
@@ -22,34 +13,10 @@
     <FxCompile Include="Source\Shader\static_mesh_vs.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
-    <FxCompile Include="Source\Shader\UVScroll_ps.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\UVScroll_vs.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
     <FxCompile Include="Source\Shader\InstancingVS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\InstancingPS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\gltfModelPs.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\gltfModelVs.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shader\phongShaderVS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shader\phongShaderPS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\SkyBoxVS.hlsl">
-      <Filter>Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\SkyBoxPS.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\sprite_dissolve_ps.hlsl">
@@ -80,40 +47,40 @@
       <Filter>Shader\Fbx</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\GlowExtractionPs.hlsl">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\GaussianBlurDownsamplingPs.hlsl">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\GaussianBlurHorizontalPs.hlsl">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\GaussianBlurVerticalPs.hlsl">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\GaussianBlurUpsamplingPs.hlsl">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\FinalPassPs.hlsl">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\FogPS.hlsl">
-      <Filter>Shader\Fog</Filter>
+      <Filter>Shader\Graphics\Fog</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\ParticleCS.hlsl">
-      <Filter>Shader\Particle</Filter>
+      <Filter>Shader\Graphics\Particle</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\ParticleGS.hlsl">
-      <Filter>Shader\Particle</Filter>
+      <Filter>Shader\Graphics\Particle</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\ParticleInitializerCS.hlsl">
-      <Filter>Shader\Particle</Filter>
+      <Filter>Shader\Graphics\Particle</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\ParticlePS.hlsl">
-      <Filter>Shader\Particle</Filter>
+      <Filter>Shader\Graphics\Particle</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\ParticleVS.hlsl">
-      <Filter>Shader\Particle</Filter>
+      <Filter>Shader\Graphics\Particle</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\SagePS.hlsl">
       <Filter>Shader\Fbx\Zelda</Filter>
@@ -146,7 +113,7 @@
       <Filter>Shader\Fbx</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\FinalPassBokehPS.hlsl">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\LoadingPS.hlsl">
       <Filter>Shader\Loading</Filter>
@@ -167,7 +134,7 @@
       <Filter>Shader\Fbx</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\FinalPassTexturePS.hlsl">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </FxCompile>
     <FxCompile Include="Source\Shader\ExpModelPS.hlsl">
       <Filter>Shader\Fbx</Filter>
@@ -198,6 +165,21 @@
     </FxCompile>
     <FxCompile Include="Source\Shader\SpriteEmissivePS.hlsl">
       <Filter>Shader\Scene\Title</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\SkyBoxPS.hlsl">
+      <Filter>Shader\Graphics\SkyBox</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\SkyBoxVS.hlsl">
+      <Filter>Shader\Graphics\SkyBox</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\gltfModelPs.hlsl">
+      <Filter>Shader\Gltf</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\gltfModelVs.hlsl">
+      <Filter>Shader\Gltf</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\LoadGameBookPS.hlsl">
+      <Filter>Shader\Scene\LoadGame</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -273,12 +255,6 @@
     <ClCompile Include="Source\Mame\Scene\BaseScene.cpp">
       <Filter>Mame\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Mame\Scene\SceneGame.cpp">
-      <Filter>Mame\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Mame\Scene\SceneLoading.cpp">
-      <Filter>Mame\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Mame\Scene\SceneManager.cpp">
       <Filter>Mame\Scene</Filter>
     </ClCompile>
@@ -348,6 +324,25 @@
     </ClCompile>
     <ClCompile Include="Source\Mame\Scene\SceneTitleState.cpp">
       <Filter>Mame\Scene\SceneTitle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Game\AI\BehaviorTree.cpp">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Game\AI\NodeBase.cpp" />
+    <ClCompile Include="Source\Mame\Game\AI\BehaviorData.cpp">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Scene\SceneLoadGame.cpp">
+      <Filter>Mame\Scene\SceneLoadGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Scene\SceneLoading.cpp">
+      <Filter>Mame\Scene\SceneLoading</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Scene\SceneGame.cpp">
+      <Filter>Mame\Scene\SceneGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Game\UI\LoadGameBook.cpp">
+      <Filter>Mame\Game\UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -424,12 +419,6 @@
     <ClInclude Include="Source\Mame\Scene\BaseScene.h">
       <Filter>Mame\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Mame\Scene\SceneGame.h">
-      <Filter>Mame\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Mame\Scene\SceneLoading.h">
-      <Filter>Mame\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Mame\Scene\SceneManager.h">
       <Filter>Mame\Scene</Filter>
     </ClInclude>
@@ -462,12 +451,6 @@
     </ClInclude>
     <ClInclude Include="Source\Mame\Resource\sprite.h">
       <Filter>Mame\Resource\Sprite</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Mame\Game\AI\State.h">
-      <Filter>Mame\Game\AI</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Mame\Game\AI\StateMachine.h">
-      <Filter>Mame\Game\AI</Filter>
     </ClInclude>
     <ClInclude Include="Source\Mame\Game\Collision\Collision.h">
       <Filter>Mame\Game\Collision</Filter>
@@ -521,33 +504,54 @@
     <ClInclude Include="Source\Mame\Scene\SceneTitleState.h">
       <Filter>Mame\Scene\SceneTitle</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Mame\Game\AI\StateMachine.h">
+      <Filter>Mame\Game\AI\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\AI\State.h">
+      <Filter>Mame\Game\AI\StateMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\AI\BehaviorTree.h">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\AI\ActionBase.h">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\AI\NodeBase.h">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\AI\JudgmentBase.h">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\AI\BehaviorData.h">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\AI\EnemyBlueSlime.h">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Scene\SceneLoadGame.h">
+      <Filter>Mame\Scene\SceneLoadGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Scene\SceneLoading.h">
+      <Filter>Mame\Scene\SceneLoading</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Scene\SceneGame.h">
+      <Filter>Mame\Scene\SceneGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\UI\LoadGameBook.h">
+      <Filter>Mame\Game\UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Source\Shader\geometric_primitive.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Source\Shader\UVScroll.hlsli">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Source\Shader\static_mesh.hlsli">
       <Filter>Shader</Filter>
     </None>
     <None Include="Source\Shader\Instancing.hlsli">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Source\Shader\gltfModel.hlsli">
-      <Filter>Shader</Filter>
-    </None>
     <None Include="Source\Shader\bidirectionalReflectanceDistributionFunction.hlsli">
       <Filter>Shader</Filter>
     </None>
     <None Include="Source\Shader\imageBasedLighting.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Resources\Shader\phongShader.hlsli">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Source\Shader\SkyBox.hlsli">
       <Filter>Shader</Filter>
     </None>
     <None Include="Source\Shader\sprite_dissolve.hlsli">
@@ -560,19 +564,19 @@
       <Filter>Shader\Fbx</Filter>
     </None>
     <None Include="Source\Shader\Bloom.hlsli">
-      <Filter>Shader\Bloom</Filter>
+      <Filter>Shader\Graphics\Bloom</Filter>
     </None>
     <None Include="Source\Shader\Noise.hlsli">
-      <Filter>Shader\Fog</Filter>
+      <Filter>Shader\Graphics\Fog</Filter>
     </None>
     <None Include="Source\Shader\Particle.hlsli">
-      <Filter>Shader\Particle</Filter>
+      <Filter>Shader\Graphics\Particle</Filter>
     </None>
     <None Include="Source\Shader\AuraEffect.hlsli">
       <Filter>Shader\Fbx\Zelda\aura</Filter>
     </None>
     <None Include="Source\Shader\PostEffect.hlsli">
-      <Filter>Shader\PostEffect</Filter>
+      <Filter>Shader\Graphics\PostEffect</Filter>
     </None>
     <None Include="Source\Shader\sprite.hlsli">
       <Filter>Shader\Sprite</Filter>
@@ -582,6 +586,12 @@
     </None>
     <None Include="Source\Shader\FullScreenQuad.hlsli">
       <Filter>Shader\FullScreenQuad</Filter>
+    </None>
+    <None Include="Source\Shader\SkyBox.hlsli">
+      <Filter>Shader\Graphics\SkyBox</Filter>
+    </None>
+    <None Include="Source\Shader\gltfModel.hlsli">
+      <Filter>Shader\Gltf</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -605,18 +615,6 @@
     </Filter>
     <Filter Include="Shader\Fbx\tama">
       <UniqueIdentifier>{5c6905b6-72d2-4c55-b844-0d827cbcb3f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\Bloom">
-      <UniqueIdentifier>{3657f708-ee44-453b-bd73-08c4838be46f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\Fog">
-      <UniqueIdentifier>{bd054dc7-1340-4b01-b533-521c6c32f0b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\Particle">
-      <UniqueIdentifier>{13521927-4ef5-4aa2-b966-57e565390fb6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shader\PostEffect">
-      <UniqueIdentifier>{601cccd0-876f-4819-a552-cbbbbfdf379a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Shader\Loading">
       <UniqueIdentifier>{526d907c-d74b-4d6f-868f-35fc7b8f1ae9}</UniqueIdentifier>
@@ -710,6 +708,48 @@
     </Filter>
     <Filter Include="Mame\Scene\SceneTitle">
       <UniqueIdentifier>{7b642775-ba46-4090-bf7b-0cefd1eee050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mame\Game\AI\StateMachine">
+      <UniqueIdentifier>{0e62f747-2aba-455a-b363-66dddd995cf7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mame\Game\AI\BehaviorTree">
+      <UniqueIdentifier>{435df7fa-96c7-4568-995c-6df932aa31d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mame\Scene\SceneLoadGame">
+      <UniqueIdentifier>{af510a54-67ef-4046-a14f-e74418d19c57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mame\Scene\SceneLoading">
+      <UniqueIdentifier>{81164de4-4807-4983-b8bd-6232e236946a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mame\Scene\SceneGame">
+      <UniqueIdentifier>{98c29d3f-cc66-49b2-9eba-6c4a66007e66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Mame\Game\UI">
+      <UniqueIdentifier>{a662d229-f32e-4e07-ac41-3bde620ef7e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Scene\LoadGame">
+      <UniqueIdentifier>{f93047d2-ac54-4657-bfaf-a95ed0488495}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Graphics">
+      <UniqueIdentifier>{b4d3ab78-48ff-4c30-b0de-c192bddeaef6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Graphics\Bloom">
+      <UniqueIdentifier>{3657f708-ee44-453b-bd73-08c4838be46f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Graphics\Fog">
+      <UniqueIdentifier>{bd054dc7-1340-4b01-b533-521c6c32f0b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Graphics\Particle">
+      <UniqueIdentifier>{13521927-4ef5-4aa2-b966-57e565390fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Graphics\PostEffect">
+      <UniqueIdentifier>{601cccd0-876f-4819-a552-cbbbbfdf379a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Graphics\SkyBox">
+      <UniqueIdentifier>{3b7852ec-a10b-4b01-a48d-67a0e19d0f82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader\Gltf">
+      <UniqueIdentifier>{e2b5f254-b940-4fe7-a59a-213b0328f207}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

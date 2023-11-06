@@ -142,17 +142,37 @@ bool Sprite::FadeOut(const float& elapsedTime)
 }
 
 // アニメーション関数
-void Sprite::PlayAnimation(const float elapsedTime, const float frameSpeed, const float totalAnimationFrame, const bool animationVertical)
+bool Sprite::PlayAnimation(const float elapsedTime, const float frameSpeed, const float totalAnimationFrame, const bool animationVertical, const bool loop)
 {
     animationTime_ += frameSpeed * elapsedTime;
 
     const int frame = static_cast<int>(animationTime_); // 小数点切り捨て
     animationFrame_ = static_cast<float>(frame);
 
-    if (animationFrame_ > totalAnimationFrame)
+    if (loop)
     {
-        animationFrame_ = 0.0f;
-        animationTime_ = 0.0f;
+        if (animationFrame_ > totalAnimationFrame)
+        {
+            animationFrame_ = 0.0f;
+            animationTime_ = 0.0f;
+        }
+    }
+    else
+    {
+        if (animationFrame_ >= totalAnimationFrame)
+        {
+            animationFrame_ = totalAnimationFrame - 1;
+
+            // ----- 一応この処理を書いておく -----
+            DirectX::XMFLOAT2 texPos = GetSpriteTransform()->GetTexPos();
+            const DirectX::XMFLOAT2 texSize = GetSpriteTransform()->GetTexSize();
+
+            if (animationVertical) texPos.y = texSize.y * animationFrame_;
+            else                   texPos.x = texSize.x * animationFrame_;
+            // ----- 一応この処理を書いておく -----
+
+            return true;
+        }
     }
 
     DirectX::XMFLOAT2 texPos = GetSpriteTransform()->GetTexPos();
@@ -162,6 +182,8 @@ void Sprite::PlayAnimation(const float elapsedTime, const float frameSpeed, cons
     else                   texPos.x = texSize.x * animationFrame_;
 
     GetSpriteTransform()->SetTexPos(texPos);
+
+    return false;
 }
 
 DirectX::XMFLOAT2 Sprite::ConvertToScreenPos(
@@ -309,7 +331,7 @@ void Sprite::Render(ID3D11DeviceContext* deviceContext, ID3D11PixelShader* psSha
         vertices[0].color = vertices[1].color = vertices[2].color = vertices[3].color = GetSpriteTransform()->GetColor();
 
         vertices[0].texcord = { GetSpriteTransform()->GetTexPosX() / texture2dDesc.Width, GetSpriteTransform()->GetTexPosY() / texture2dDesc.Height };
-        vertices[1].texcord = { GetSpriteTransform()->GetTexPosX() + GetSpriteTransform()->GetTexSizeX() / texture2dDesc.Width,GetSpriteTransform()->GetTexPosY() / texture2dDesc.Height };
+        vertices[1].texcord = { (GetSpriteTransform()->GetTexPosX() + GetSpriteTransform()->GetTexSizeX()) / texture2dDesc.Width,GetSpriteTransform()->GetTexPosY() / texture2dDesc.Height };
         vertices[2].texcord = { GetSpriteTransform()->GetTexPosX() / texture2dDesc.Width, (GetSpriteTransform()->GetTexPosY() + GetSpriteTransform()->GetTexSizeY()) / texture2dDesc.Height };
         vertices[3].texcord = { (GetSpriteTransform()->GetTexPosX() + GetSpriteTransform()->GetTexSizeX()) / texture2dDesc.Width, (GetSpriteTransform()->GetTexPosY() + GetSpriteTransform()->GetTexSizeY()) / texture2dDesc.Height };
     }

@@ -42,6 +42,8 @@ public:
 	framework(framework&&) noexcept = delete;
 	framework& operator=(framework&&) noexcept = delete;
 
+	// 外部からゲーム終了させるための関数
+	static void GameEnd() { isGameEnd_ = true; }
 
 	int run()
 	{
@@ -67,7 +69,7 @@ public:
 				tictoc.tick();
 				CalculateFrameStats();
 				update(tictoc.time_interval());
-				render(tictoc.time_interval());
+				render();
 			}
 		}
 
@@ -111,7 +113,7 @@ public:
 			if (wparam == VK_ESCAPE)
 			{
 				// ESCで落とす
-				PostMessage(hwnd, WM_CLOSE, 0, 0);
+				GameEnd(true);
 			}
 			break;
 		case WM_ENTERSIZEMOVE:
@@ -138,8 +140,13 @@ public:
 private:
 	bool initialize();
 	void update(float elapsed_time/*Elapsed seconds from last frame*/);
-	void render(float elapsed_time/*Elapsed seconds from last frame*/);
+	void render();
 	bool uninitialize();
+
+	void GameEnd(bool o/*オーバーロード用に仮で引数付けてる*/)
+	{
+		PostMessage(hwnd, WM_CLOSE, 0, 0);
+	}
 
 public:
 	static high_resolution_timer tictoc;
@@ -166,4 +173,7 @@ public:
 			elapsedTime += 1.0f;
 		}
 	}
+	
+private:
+	static bool isGameEnd_;
 };

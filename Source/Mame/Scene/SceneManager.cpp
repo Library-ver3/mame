@@ -47,7 +47,7 @@ namespace Mame::Scene
     }
 
     // •`‰æˆ—
-    void SceneManager::Render(float elapsedTime)
+    void SceneManager::Render()
     {
         if (!currentScene)return;
 

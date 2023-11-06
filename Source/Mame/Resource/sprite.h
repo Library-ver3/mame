@@ -86,6 +86,8 @@ public:
         void SetColorG(const float& g) { color_.y = g; }
         void SetColorB(const float& b) { color_.z = b; }
         void SetColorA(const float& a) { color_.w = a; }
+        void SetColorWhite() { color_ = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, color_.w); }
+        void SetColorBlack() { color_ = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, color_.w); }
 
         // ----- 角度 -----
         float GetAngle() { return angle_; }
@@ -181,12 +183,20 @@ public:
     /// <param name="frameSpeed">アニメーションする速さ</param>
     /// <param name="totalAnimationFrame">アニメーションフレーム数</param>
     /// <param name="animationVertical">縦アニメーションの場合true</param>
-    void PlayAnimation(
+    bool PlayAnimation(
         const float elapsedTime,
         const float frameSpeed,
         const float totalAnimationFrame,
-        const bool animationVertical
+        const bool animationVertical = false,
+        const bool loop = false
     );
+
+    void ResetAnimation()
+    {
+        spriteTransform_.SetTexPos(DirectX::XMFLOAT2(0, 0));
+        animationTime_ = 0.0f;
+        animationFrame_ = 0.0f;
+    }
 
     //ワールド座標からスクリーン座標に変更後描画
     static DirectX::XMFLOAT2 ConvertToScreenPos(const DirectX::XMFLOAT3 worldPos, bool* isDraw = nullptr); // isDraw：描画するか

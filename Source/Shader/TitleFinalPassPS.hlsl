@@ -7,6 +7,7 @@
 SamplerState samplerStates[3] : register(s0);
 Texture2D colorMap : register(t0);
 Texture2D bloomMap : register(t1);
+Texture2D colorMap1 : register(t2);
 
 float3 reinhardToneMapping(float3 color)
 {
@@ -20,8 +21,9 @@ float4 main(PSIn psIn) : SV_TARGET
 {
     float4 color = colorMap.Sample(samplerStates[LINEAR], psIn.texcoord);
     float4 bloom = bloomMap.Sample(samplerStates[LINEAR], psIn.texcoord);
+    float4 color1 = colorMap1.Sample(samplerStates[LINEAR], psIn.texcoord);
 	
-    float3 finalColor = color.rgb + bloom.rgb;
+    float3 finalColor = color.rgb + bloom.rgb + color1.rgb;
     float alpha = color.a;
     
     // Tone Map

@@ -17,6 +17,8 @@ public:// 定数
         PressAnyButtonFadeOut,
         SelectFadeIn,
         Select,
+        QuitGameChose,
+        LoadGameChose,
     };
 
 public:// 基本的な関数
@@ -37,17 +39,24 @@ public:// 取得・設定
 
     void SetCurrentState(SceneTitle::STATE state) { currentState_ = static_cast<UINT>(state); }    
     int GetCurrentState() { return currentState_; }
+    void SetSelectState(int state) { selectState_ = state; }
+    int GetSelectState() { return selectState_; }
 
 private:
     // ステートマシン
     std::unique_ptr<StateMachine<State<SceneTitle>>> stateMachine_ = nullptr;
     int currentState_ = 0;  // 現在のステート
+    int selectState_ = 0;   // 選択してた物を保持するための変数
     
 public:// ステートマシンで触るためにpublicで定義
     std::unique_ptr<Sprite> titleLogoSprite_;
     std::unique_ptr<Sprite> pressAnyButtonSprite_;
-    std::unique_ptr<Sprite> LoadGameSprite_;
-    std::unique_ptr<Sprite> QuitGameSprite_;
+    std::unique_ptr<Sprite> loadGameSprite_;
+    std::unique_ptr<Sprite> quitGameSprite_;
+    std::unique_ptr<Sprite> blackBeltSprite_;
+    std::unique_ptr<Sprite> quitGameWordSprite_;
+    std::unique_ptr<Sprite> loadGameWordSprite_;
+    std::unique_ptr<Sprite> choseSprite_;
 
 
 private:// シェーダー関連

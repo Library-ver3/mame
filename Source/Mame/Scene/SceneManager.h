@@ -19,7 +19,7 @@ namespace Mame::Scene
 
         void Initialize();
         void Update(float elapesdTime);  // XVˆ—
-        void Render(float elapsedTime);  // •`‰æˆ—
+        void Render();                  // •`‰æˆ—
 
         void DrawDebug();
 

@@ -8,11 +8,13 @@
 #include "../Scene/SceneLoading.h"
 #include "../Scene/SceneTitle.h"
 #include "../Scene/SceneGame.h"
+#include "../Scene/SceneLoadGame.h"
 
 #include "../Resource/AudioManager.h"
 #include "../Resource/texture.h"
 
 high_resolution_timer framework::tictoc = {};
+bool framework::isGameEnd_ = false;
 
 framework::framework(HWND hwnd)
     : hwnd(hwnd),
@@ -46,8 +48,9 @@ bool framework::initialize()
 
     // シーン
     Mame::Scene::SceneManager::Instance().Initialize();
-    Mame::Scene::SceneManager::Instance().ChangeScene(new SceneTitle);
+    //Mame::Scene::SceneManager::Instance().ChangeScene(new SceneTitle);
     //Mame::Scene::SceneManager::Instance().ChangeScene(new SceneGame);
+    Mame::Scene::SceneManager::Instance().ChangeScene(new SceneLoadGame);
     
 #ifndef _DEBUG
     ShowCursor(!FULLSCREEN);	// フルスクリーン時はカーソルを消す
@@ -67,9 +70,15 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
 
     // シーン更新処理
     Mame::Scene::SceneManager::Instance().Update(elapsed_time);
+
+    // シーン内でゲーム終了させるための処理
+    if (isGameEnd_)
+    {
+        GameEnd(true);
+    }
 }
 
-void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
+void framework::render()
 {
     Graphics& graphics = Graphics::Instance();
 
@@ -77,7 +86,7 @@ void framework::render(float elapsed_time/*Elapsed seconds from last frame*/)
     graphics.GetShader()->SetSamplerState(graphics.GetDeviceContext());
 
     // シーン描画
-    Mame::Scene::SceneManager::Instance().Render(elapsed_time);
+    Mame::Scene::SceneManager::Instance().Render();
 
     // ImGui表示
     IMGUI_CTRL_DISPLAY();
