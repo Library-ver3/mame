@@ -1,6 +1,9 @@
 #pragma once
 #include "Character.h"
 
+#include "../AI/StateMachine.h"
+#include "../../Input/Input.h"
+
 class Player : public Character
 {
 public:// 定数
@@ -21,8 +24,15 @@ public:// 定数
         HardAttack,     // 強攻撃
         EnemyWalk,      // 歩き別ver
     };
+
+    enum class STATE
+    {
+        Idle,
+        Walk,
+        Jump,
+    };
 #pragma endregion // Constants
-public:// 基本的な関数
+public:// 基本的な関数 ( override された関数 )
     Player();
     ~Player() override;
 
@@ -33,7 +43,45 @@ public:// 基本的な関数
         ID3D11PixelShader* psShader = nullptr)  override;
     void DrawDebug()                            override;
 
-private:
+public:
+    // ----- 入力値をカメラから見たベクトルに変換する -----
+    void ConvertToCameraMoveVec(float ax, float ay);
+
+public:// 取得・設定
+    // ---------- Getter,Setter,etc... ----------
+#pragma region [Get,Set]Function
+    // ----- ステートマシン -----
+    StateMachine<State<Player>>* GetStateMachine() { return stateMachine_.get(); }
+    // --- ステート切り替え ---
+    void ChangeState(STATE state);
+
+
+
+#pragma endregion// [Get,Set]Function
+
+    // ---------- 入力関数 ----------
+#pragma region [Input]Function
+    static bool InputLockOn()
+    {
+        return (Input::Instance().GetGamePad().GetButtonDown() & GamePad::BTN_RIGHT_THUMB);
+    }
+#pragma endregion// [Input]Function
+
+private:// メンバ変数
+    // ---------- 移動 ---------------------------------------------
+    DirectX::XMFLOAT3 velocity = {}; // 速度
+    
+    // --- カメラの向いている方向を前とした移動方向ベクトル ---
+    DirectX::XMFLOAT3 moveVec  = {};
+
+    // -------------------------------------------------------------
+
+    // ---------- ステートマシン ------------------------------------
+    std::unique_ptr<StateMachine<State<Player>>> stateMachine_;
+    // -------------------------------------------------------------
+
+    // ---------- シェーダー ----------------------------------------
     Microsoft::WRL::ComPtr<ID3D11PixelShader> psShader_ = nullptr;
+    // -------------------------------------------------------------
 };
 

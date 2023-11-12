@@ -22,15 +22,6 @@
     <FxCompile Include="Source\Shader\sprite_dissolve_ps.hlsl">
       <Filter>Shader\Sprite</Filter>
     </FxCompile>
-    <FxCompile Include="Source\Shader\sprite_dissolve_vs.hlsl">
-      <Filter>Shader\Sprite</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\sprite_fade_ps.hlsl">
-      <Filter>Shader\Sprite</Filter>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\sprite_fade_vs.hlsl">
-      <Filter>Shader\Sprite</Filter>
-    </FxCompile>
     <FxCompile Include="Source\Shader\sprite_ps.hlsl">
       <Filter>Shader\Sprite</Filter>
     </FxCompile>
@@ -163,9 +154,6 @@
     <FxCompile Include="Source\Shader\FullScreenQuadVS.hlsl">
       <Filter>Shader\FullScreenQuad</Filter>
     </FxCompile>
-    <FxCompile Include="Source\Shader\SpriteEmissivePS.hlsl">
-      <Filter>Shader\Scene\Title</Filter>
-    </FxCompile>
     <FxCompile Include="Source\Shader\SkyBoxPS.hlsl">
       <Filter>Shader\Graphics\SkyBox</Filter>
     </FxCompile>
@@ -180,6 +168,12 @@
     </FxCompile>
     <FxCompile Include="Source\Shader\LoadGameBookPS.hlsl">
       <Filter>Shader\Scene\LoadGame</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\SpriteDissolvePS.hlsl">
+      <Filter>Shader\Sprite</Filter>
+    </FxCompile>
+    <FxCompile Include="Source\Shader\SpriteEmissivePS.hlsl">
+      <Filter>Shader\Sprite</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
@@ -328,7 +322,6 @@
     <ClCompile Include="Source\Mame\Game\AI\BehaviorTree.cpp">
       <Filter>Mame\Game\AI\BehaviorTree</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Mame\Game\AI\NodeBase.cpp" />
     <ClCompile Include="Source\Mame\Game\AI\BehaviorData.cpp">
       <Filter>Mame\Game\AI\BehaviorTree</Filter>
     </ClCompile>
@@ -341,8 +334,20 @@
     <ClCompile Include="Source\Mame\Scene\SceneGame.cpp">
       <Filter>Mame\Scene\SceneGame</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Mame\Game\UI\LoadGameBook.cpp">
-      <Filter>Mame\Game\UI</Filter>
+    <ClCompile Include="Source\Mame\Scene\SceneLoadGameState.cpp">
+      <Filter>Mame\Scene\SceneLoadGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Game\AI\NodeBase.cpp">
+      <Filter>Mame\Game\AI\BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Scene\SceneLoadingBack.cpp">
+      <Filter>Mame\Scene\SceneLoading</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Scene\LoadingPlayer.cpp">
+      <Filter>Mame\Scene\SceneLoading</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Mame\Game\Character\PlayerState.cpp">
+      <Filter>Mame\Game\Character\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -537,8 +542,17 @@
     <ClInclude Include="Source\Mame\Scene\SceneGame.h">
       <Filter>Mame\Scene\SceneGame</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Mame\Game\UI\LoadGameBook.h">
-      <Filter>Mame\Game\UI</Filter>
+    <ClInclude Include="Source\Mame\Scene\SceneLoadGameState.h">
+      <Filter>Mame\Scene\SceneLoadGame</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Scene\SceneLoadingBack.h">
+      <Filter>Mame\Scene\SceneLoading</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Scene\LoadingPlayer.h">
+      <Filter>Mame\Scene\SceneLoading</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Mame\Game\Character\PlayerState.h">
+      <Filter>Mame\Game\Character\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -554,10 +568,7 @@
     <None Include="Source\Shader\imageBasedLighting.hlsli">
       <Filter>Shader</Filter>
     </None>
-    <None Include="Source\Shader\sprite_dissolve.hlsli">
-      <Filter>Shader\Sprite</Filter>
-    </None>
-    <None Include="Source\Shader\sprite_fade.hlsli">
+    <None Include="Source\Shader\SpriteDissolve.hlsli">
       <Filter>Shader\Sprite</Filter>
     </None>
     <None Include="Source\Shader\FbxModel.hlsli">

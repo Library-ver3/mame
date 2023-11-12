@@ -5,6 +5,46 @@
 
 #include "../Core/framework.h"
 
+// FadeInState
+namespace SceneTitleState
+{
+    // 初期化
+    void FadeInState::Initialize()
+    {
+        // 変数初期化
+        easingTimer_ = 0.0f;
+    }
+
+    // 更新
+    void FadeInState::Update(const float& elapsedTime)
+    {
+        float maxTime = 1.0f;
+        if (easingTimer_ <= maxTime)
+        {
+            float alpha = Easing::InSine(easingTimer_, maxTime, 1.0f, 0.0f);
+
+            owner->titleLogoSprite_->GetSpriteTransform()->SetColorA(alpha);
+            owner->pressAnyButtonSprite_->GetSpriteTransform()->SetColorA(alpha);
+
+            easingTimer_ += elapsedTime;
+        }
+        else
+        {
+            owner->titleLogoSprite_->GetSpriteTransform()->SetColorA(1.0f);
+            owner->pressAnyButtonSprite_->GetSpriteTransform()->SetColorA(1.0f);
+
+            // 次のステートへ
+            owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::PressAnyButton));
+            return;
+        }
+    }
+
+    // 終了化
+    void FadeInState::Finalize()
+    {
+    }
+}
+
 // PressAnyButtonState
 namespace SceneTitleState
 {
@@ -272,6 +312,12 @@ namespace SceneTitleState
                 break;
             }
 
+            // ゲーム選択
+            if (gamePad.GetButtonDown() & GamePad::BTN_A)
+            {
+                owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::LoadGameFadeOut));
+                return;
+            }
 
             owner->loadGameSprite_->GetEmissive()->SetEmissiveIntensity(
                 UpdateBrightness(elapsedTime, "LoadGame"));
@@ -397,7 +443,6 @@ namespace SceneTitleState
         // 変数初期化
         isChose_ = false;
         isPlayAnimation_ = false;
-        isButtonPush = false;
         currentState_ = 0;
         easingTimer_ = 0.0f;
         animationTimer_ = 0.0f;
@@ -439,7 +484,18 @@ namespace SceneTitleState
             
 #pragma region [はい,いいえ]を選択
             if (currentState_ == static_cast<UINT>(STATE::Yes))
-            {
+            {   // [はい] にカーソルがある
+                if (gamePad.GetButtonDown() & GamePad::BTN_B)
+                {
+                    easingTimer_ = 0.0f;
+                    isPlayAnimation_ = false;
+                    owner->choseSprite_->ResetAnimation();
+                    owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
+
+                    currentState_ = static_cast<UINT>(STATE::No);
+                    return;
+                }
+
                 if (aLx > 0.8f)
                 {
                     easingTimer_ = 0.0f;
@@ -492,28 +548,24 @@ namespace SceneTitleState
 
             if (isPlayAnimation_)
             {   // アニメーション再生
-                if (owner->choseSprite_->PlayAnimation(elapsedTime, 15.0f, 3, false))
-                {   // ボタンが押せるようになる
-                    isButtonPush = true;
-                }
+                owner->choseSprite_->PlayAnimation(elapsedTime, 15.0f, 3, false);
             }
 
-            // ボタンが押せる
-            if (isButtonPush)
-            {
-                if (currentState_ == static_cast<UINT>(STATE::Yes))
-                {   // ゲーム終了
-                    if(gamePad.GetButtonDown()&GamePad::BTN_A)
-                        framework::GameEnd();
-                    return;
-                }
-                else
-                {   // selectに戻る
-                    if (gamePad.GetButtonDown() & GamePad::BTN_A)
-                    owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::Select));
-                    return;
-                }
+
+            // ボタン押す処理
+            if (currentState_ == static_cast<UINT>(STATE::Yes))
+            {   // ゲーム終了
+                if (gamePad.GetButtonDown() & GamePad::BTN_A)
+                    framework::GameEnd();
+                return;
             }
+            else
+            {   // selectに戻る
+                if (gamePad.GetButtonDown() & GamePad::BTN_A)
+                    owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::Select));
+                return;
+            }
+
         }
     }
 
@@ -523,7 +575,60 @@ namespace SceneTitleState
     }
 }
 
+// LoadGameFadeOut
 namespace SceneTitleState
 {
+    // 初期化
+    void LoadGameFadeOut::Initialize()
+    {
+        // 現在のステートを設定
+        owner->SetCurrentState(SceneTitle::STATE::LoadGameFadeOut);
 
+        // 変数初期化
+        easingTimer_ = 0.0f;
+        delayTimer_ = 0.0f;
+        isChangeScene_ = false;
+    }
+
+    // 更新
+    void LoadGameFadeOut::Update(const float& elapsedTime)
+    {
+        float maxTime = 1.0f;
+        float maxAlpha = 1.0f;
+        float minAlpha = 0.0f;
+        if (easingTimer_ <= maxTime)
+        {
+            float alpha = Easing::InSine(easingTimer_, maxTime, minAlpha, maxAlpha);
+
+            owner->titleLogoSprite_->GetSpriteTransform()->SetColorA(alpha);
+            owner->loadGameSprite_->GetSpriteTransform()->SetColorA(alpha);
+            owner->quitGameSprite_->GetSpriteTransform()->SetColorA(alpha);
+
+            easingTimer_ += elapsedTime;
+        }
+        else
+        {
+            owner->titleLogoSprite_->GetSpriteTransform()->SetColorA(minAlpha);
+            owner->loadGameSprite_->GetSpriteTransform()->SetColorA(minAlpha);
+            owner->quitGameSprite_->GetSpriteTransform()->SetColorA(minAlpha);
+
+            // すぐに切り替わるのはダサいから少しディレイをはさむ
+            float maxDelay = 0.3f;
+            delayTimer_ += elapsedTime;
+            if (delayTimer_ >= maxDelay)
+            {
+                // シーン切り替え
+                if (owner->GetIsReady())
+                {
+                    owner->ChangeScene();
+                    return;
+                }
+            }
+        }
+    }
+
+    // 終了化
+    void LoadGameFadeOut::Finalize()
+    {
+    }
 }

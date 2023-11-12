@@ -51,3 +51,28 @@ void Player::DrawDebug()
         ImGui::EndMenu();
     }
 }
+
+// 入力値をカメラから見たベクトルに変換する
+void Player::ConvertToCameraMoveVec(float ax, float ay)
+{
+    //  入力があったら
+    if (ax || ay)
+    {
+        DirectX::XMFLOAT3 forward = Camera::Instance().GetForward();
+        DirectX::XMFLOAT3 right   = Camera::Instance().GetRight();
+
+        forward.x *= ay;
+        forward.z *= ay;
+        right.x   *= ax;
+        right.z   *= ax;
+
+        
+
+    }
+}
+
+// ステート切り替え
+void Player::ChangeState(STATE state)
+{
+    GetStateMachine()->ChangeState(static_cast<UINT>(state));
+}

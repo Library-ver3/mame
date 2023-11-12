@@ -1,10 +1,10 @@
-#include "sprite_dissolve.hlsli"
+#include "SpriteDissolve.hlsli"
 
 Texture2D colorMap : register(t0);
 SamplerState colorSamplerState : register(s0);
 Texture2D maskTexture : register(t1);
 
-float4 main(VS_OUT psIn) : SV_TARGET
+float4 main(PSIn psIn) : SV_TARGET
 {
     float4 color = colorMap.Sample(colorSamplerState, psIn.texcoord) * psIn.color;
     

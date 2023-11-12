@@ -24,7 +24,8 @@ public:
 public:
     // ----- 固定カメラ -----
     void FixedInitialize();         // 固定カメラ初期化
-    void FixedSetPerSpectiveFov();  // 固定カメラ用
+    void FixedSetPerSpectiveFov();  // 固定カメラ用 (透視投影)
+    void FixedOrthographic();       // 固定カメラ用 (平行投影)
 
     // ----- SceneGame用 -----
     void GameCameraInitialize();

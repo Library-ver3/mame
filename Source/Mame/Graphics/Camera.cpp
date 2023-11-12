@@ -32,6 +32,24 @@ void Camera::FixedSetPerSpectiveFov()
     V = { DirectX::XMMatrixLookAtLH(eye, focus, up) };
 }
 
+void Camera::FixedOrthographic()
+{
+    D3D11_VIEWPORT viewport{};
+    UINT unm_viewports{ 1 };
+    Graphics::Instance().GetDeviceContext()->RSGetViewports(&unm_viewports, &viewport);
+
+
+
+
+    DirectX::XMMatrixOrthographicLH(viewport.Width, viewport.Height, 0.1f, 10.0f);
+    //DirectX::XMMatrixOrthographicLH(viewport.Width, viewport.Height, 0.1f, 1000.0f);
+
+    DirectX::XMVECTOR eye = { DirectX::XMVectorSet(camera.eye.x,camera.eye.y,camera.eye.z,1.0f) };
+    DirectX::XMVECTOR focus = { DirectX::XMVectorSet(camera.focus.x,camera.focus.y,camera.focus.z,1.0f) };
+    DirectX::XMVECTOR up = { DirectX::XMVectorSet(camera.up.x,camera.up.y,camera.up.z,0.0f) };
+    V = { DirectX::XMMatrixLookAtLH(eye, focus, up) };
+}
+
 // SceneGame—p
 void Camera::GameCameraInitialize()
 {

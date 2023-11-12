@@ -209,12 +209,12 @@
     <ClCompile Include="Source\Mame\Game\Character\Character.cpp" />
     <ClCompile Include="Source\Mame\Game\Character\Player.cpp" />
     <ClCompile Include="Source\Mame\Game\Character\PlayerManager.cpp" />
+    <ClCompile Include="Source\Mame\Game\Character\PlayerState.cpp" />
     <ClCompile Include="Source\Mame\Game\Collision\Collision.cpp" />
     <ClCompile Include="Source\Mame\Game\GameObject.cpp" />
     <ClCompile Include="Source\Mame\Game\Stage\Stage.cpp" />
     <ClCompile Include="Source\Mame\Game\Stage\StageManager.cpp" />
     <ClCompile Include="Source\Mame\Game\Stage\StageWall.cpp" />
-    <ClCompile Include="Source\Mame\Game\UI\LoadGameBook.cpp" />
     <ClCompile Include="Source\Mame\Graphics\Bloom.cpp" />
     <ClCompile Include="Source\Mame\Graphics\Camera.cpp" />
     <ClCompile Include="Source\Mame\Graphics\DebugRenderer.cpp" />
@@ -240,9 +240,12 @@
     <ClCompile Include="Source\Mame\Resource\sprite.cpp" />
     <ClCompile Include="Source\Mame\Resource\texture.cpp" />
     <ClCompile Include="Source\Mame\Scene\BaseScene.cpp" />
+    <ClCompile Include="Source\Mame\Scene\LoadingPlayer.cpp" />
     <ClCompile Include="Source\Mame\Scene\SceneGame.cpp" />
     <ClCompile Include="Source\Mame\Scene\SceneLoadGame.cpp" />
+    <ClCompile Include="Source\Mame\Scene\SceneLoadGameState.cpp" />
     <ClCompile Include="Source\Mame\Scene\SceneLoading.cpp" />
+    <ClCompile Include="Source\Mame\Scene\SceneLoadingBack.cpp" />
     <ClCompile Include="Source\Mame\Scene\SceneManager.cpp" />
     <ClCompile Include="Source\Mame\Scene\SceneTitle.cpp" />
     <ClCompile Include="Source\Mame\Scene\SceneTitleState.cpp" />
@@ -271,12 +274,12 @@
     <ClInclude Include="Source\Mame\Game\Character\Character.h" />
     <ClInclude Include="Source\Mame\Game\Character\Player.h" />
     <ClInclude Include="Source\Mame\Game\Character\PlayerManager.h" />
+    <ClInclude Include="Source\Mame\Game\Character\PlayerState.h" />
     <ClInclude Include="Source\Mame\Game\Collision\Collision.h" />
     <ClInclude Include="Source\Mame\Game\GameObject.h" />
     <ClInclude Include="Source\Mame\Game\Stage\Stage.h" />
     <ClInclude Include="Source\Mame\Game\Stage\StageManager.h" />
     <ClInclude Include="Source\Mame\Game\Stage\StageWall.h" />
-    <ClInclude Include="Source\Mame\Game\UI\LoadGameBook.h" />
     <ClInclude Include="Source\Mame\Graphics\Bloom.h" />
     <ClInclude Include="Source\Mame\Graphics\Camera.h" />
     <ClInclude Include="Source\Mame\Graphics\ConstantBuffer.h" />
@@ -307,9 +310,12 @@
     <ClInclude Include="Source\Mame\Resource\sprite.h" />
     <ClInclude Include="Source\Mame\Resource\texture.h" />
     <ClInclude Include="Source\Mame\Scene\BaseScene.h" />
+    <ClInclude Include="Source\Mame\Scene\LoadingPlayer.h" />
     <ClInclude Include="Source\Mame\Scene\SceneGame.h" />
     <ClInclude Include="Source\Mame\Scene\SceneLoadGame.h" />
+    <ClInclude Include="Source\Mame\Scene\SceneLoadGameState.h" />
     <ClInclude Include="Source\Mame\Scene\SceneLoading.h" />
+    <ClInclude Include="Source\Mame\Scene\SceneLoadingBack.h" />
     <ClInclude Include="Source\Mame\Scene\SceneManager.h" />
     <ClInclude Include="Source\Mame\Scene\SceneTitle.h" />
     <ClInclude Include="Source\Mame\Scene\SceneTitleState.h" />
@@ -612,6 +618,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="Source\Shader\SpriteDissolvePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="Source\Shader\SpriteEmissivePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -623,24 +635,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\sprite_dissolve_vs.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\sprite_fade_ps.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Source\Shader\sprite_fade_vs.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="Source\Shader\sprite_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -700,8 +694,7 @@
     <None Include="Source\Shader\PostEffect.hlsli" />
     <None Include="Source\Shader\SkyBox.hlsli" />
     <None Include="Source\Shader\sprite.hlsli" />
-    <None Include="Source\Shader\sprite_dissolve.hlsli" />
-    <None Include="Source\Shader\sprite_fade.hlsli" />
+    <None Include="Source\Shader\SpriteDissolve.hlsli" />
     <None Include="Source\Shader\static_mesh.hlsli" />
   </ItemGroup>
   <ItemGroup>

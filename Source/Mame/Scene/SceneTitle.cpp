@@ -1,4 +1,6 @@
 #include "SceneTitle.h"
+#include "SceneManager.h"
+#include "SceneLoadGame.h"
 
 #include "../Graphics/Graphics.h"
 #include "../Graphics/shader.h"
@@ -8,6 +10,11 @@
 #include "../Other/Easing.h"
 
 #include "SceneTitleState.h"
+
+// コンストラクタ
+SceneTitle::SceneTitle(BaseScene* nextScene) : nextScene_(nextScene)
+{
+}
 
 // リソース生成
 void SceneTitle::CreateResource()
@@ -25,13 +32,11 @@ void SceneTitle::CreateResource()
         quitGameSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
             L"./Resources/Image/Title/QuitGame.png");
         blackBeltSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
-            L"./Resources/Image/Title/blackBelt.png");
+            L"./Resources/Image/UI/blackBelt.png");
         quitGameWordSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
             L"./Resources/Image/Title/quitGameWord.png");
-        loadGameWordSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
-            L"./Resources/Image/Title/loadGameWord.png");
         choseSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
-            L"./Resources/Image/Title/chose.png");
+            L"./Resources/Image/UI/chose.png");
     }
 
     // シェーダー関連
@@ -53,13 +58,15 @@ void SceneTitle::CreateResource()
     {
         stateMachine_.reset(new StateMachine<State<SceneTitle>>);
 
+        GetStateMachine()->RegisterState(new SceneTitleState::FadeInState(this));
         GetStateMachine()->RegisterState(new SceneTitleState::PressAnyButtonState(this));
         GetStateMachine()->RegisterState(new SceneTitleState::PressAnyButtonFadeOutState(this));
         GetStateMachine()->RegisterState(new SceneTitleState::SelectFadeInState(this));
         GetStateMachine()->RegisterState(new SceneTitleState::SelectState(this));
         GetStateMachine()->RegisterState(new SceneTitleState::QuitGameChoseState(this));
+        GetStateMachine()->RegisterState(new SceneTitleState::LoadGameFadeOut(this));
 
-        GetStateMachine()->SetState(static_cast<UINT>(STATE::PressAnyButton));
+        GetStateMachine()->SetState(static_cast<UINT>(STATE::FadeIn));
     }
 }
 
@@ -92,11 +99,21 @@ void SceneTitle::Initialize()
     choseSprite_->GetSpriteTransform()->SetPos(DirectX::XMFLOAT2(450, 375));
     choseSprite_->GetSpriteTransform()->SetSize(DirectX::XMFLOAT2(100, 100));
     choseSprite_->GetSpriteTransform()->SetTexSize(DirectX::XMFLOAT2(100, 100));
+
+    // ----- スレッド開始 -----
+    thread_ = new std::thread(LoadingThread, this);
 }
 
 // 終了化
 void SceneTitle::Finalize()
 {
+    // スレッド終了
+    thread_->join();
+    if (thread_ != nullptr)
+    {
+        delete thread_;
+        thread_ = nullptr;
+    }
 }
 
 
@@ -136,6 +153,9 @@ void SceneTitle::Render()
 
         switch (currentState_)
         {
+        case static_cast<UINT>(STATE::FadeIn):
+            pressAnyButtonSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            break;
         case static_cast<UINT>(STATE::PressAnyButton):
             pressAnyButtonSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
             break;
@@ -154,6 +174,10 @@ void SceneTitle::Render()
             loadGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
             quitGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
             blackBeltSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            break;
+        case static_cast<UINT>(STATE::LoadGameFadeOut):
+            loadGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
+            quitGameSprite_->Render(spriteEmissivePS_.Get(), "Emissive");
             break;
         }
     }
@@ -190,12 +214,6 @@ void SceneTitle::Render()
             choseSprite_->Render();
             quitGameWordSprite_->Render();
             break;
-
-        case static_cast<UINT>(STATE::LoadGameChose):
-            blackBeltSprite_->Render();
-            choseSprite_->Render();
-            loadGameWordSprite_->Render();
-            break;
         }
 
     }
@@ -212,4 +230,27 @@ void SceneTitle::DrawDebug()
     choseSprite_->DrawDebug();
 
     ImGui::End();
+}
+
+// シーン切り替え
+void SceneTitle::ChangeScene()
+{
+    SceneManager::Instance().ChangeScene(nextScene_);
+}
+
+// スレッド
+void SceneTitle::LoadingThread(SceneTitle* scene)
+{
+    // COM関連の初期化でスレッド毎に呼ぶ必要がある
+    std::ignore = CoInitialize(nullptr); // std::ignoreで返り値警告解消
+
+    // 次のシーンの初期化を行う
+    scene->nextScene_->CreateResource();
+    scene->nextScene_->Initialize();
+
+    // スレッドが終わる前にCOM関連の終了化
+    CoUninitialize();
+
+    // 次のシーンの準備完了設定
+    scene->nextScene_->SetReady();
 }

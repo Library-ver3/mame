@@ -13,7 +13,7 @@ NoiseTexture::NoiseTexture()
     D3D11_TEXTURE2D_DESC noiseTexture2dDesc{};
 
     LoadTextureFromFile(graphics.GetDevice(),
-        L"./Resources/Image/Mask/noise.png",
+        L"./Resources/Image/Mask/Fade/mask1.png",
         noiseTexture[0].GetAddressOf(), &noiseTexture2dDesc);
 }
 

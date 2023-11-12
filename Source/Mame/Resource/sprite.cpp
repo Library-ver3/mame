@@ -225,15 +225,11 @@ void Sprite::Render(ID3D11PixelShader* psShader, const char* type)
     Graphics& graphics = Graphics::Instance();
     Shader* shader = graphics.GetShader();
     
-    if (type == "Emissive")
-    {
-        shader->SetEmissiveColor(GetEmissive()->GetEmissiveColor());
-        shader->SetEmissiveIntensity(GetEmissive()->GetEmissiveIntensity());
-        shader->UpdateEmissiveConstants(6);
-    }
+    // 何をセットするのかによって分ける
+    SetConstantBuffer(type);
 
     // spriteDissolve
-        NoiseTexture::Instance().SetConstantBuffers(1);
+    NoiseTexture::Instance().SetConstantBuffers(1);
 
     // 定数バッファの更新
     {
@@ -249,6 +245,24 @@ void Sprite::Render(ID3D11PixelShader* psShader, const char* type)
 
     // 描画
     Render(graphics.GetDeviceContext(), psShader);
+}
+
+void Sprite::SetConstantBuffer(const char* type)
+{
+    Shader* shader = Graphics::Instance().GetShader();
+
+    if (type == "Emissive")
+    {
+        shader->SetEmissiveColor(GetEmissive()->GetEmissiveColor());
+        shader->SetEmissiveIntensity(GetEmissive()->GetEmissiveIntensity());
+        shader->UpdateEmissiveConstants(6);
+    }
+
+    if (type == "Dissolve")
+    {
+        shader->SetDissolveIntensity(GetSpriteDissolve()->GetDissolveValue());
+        shader->UpdateDissolveConstants(3);
+    }
 }
 
 

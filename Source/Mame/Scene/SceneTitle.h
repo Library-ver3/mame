@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseScene.h"
 
+#include <thread>
 #include <memory>
 
 #include "../Resource/sprite.h"
@@ -13,16 +14,17 @@ class SceneTitle : public BaseScene
 public:// 定数
     enum class STATE
     {
+        FadeIn,
         PressAnyButton,
         PressAnyButtonFadeOut,
         SelectFadeIn,
         Select,
         QuitGameChose,
-        LoadGameChose,
+        LoadGameFadeOut,
     };
 
 public:// 基本的な関数
-    SceneTitle() {}
+    SceneTitle(BaseScene* nextScene);
     ~SceneTitle()       override {}
 
     void CreateResource()                   override; // リソース生成
@@ -31,43 +33,60 @@ public:// 基本的な関数
     void Update(const float& elapsedTime)   override; // 更新処理
     void Render()                           override; // 描画処理
 
-    void DrawDebug()    override;
+    void DrawDebug()                        override; // ImGui用
 
 public:// 取得・設定
-    // ステートマシン
+#pragma region [Get,Set]Function
+    // ----- ステートマシン -----
     StateMachine<State<SceneTitle>>* GetStateMachine() const { return stateMachine_.get(); }
-
-    void SetCurrentState(SceneTitle::STATE state) { currentState_ = static_cast<UINT>(state); }    
+    
+    // --- 現在のステート ---
     int GetCurrentState() { return currentState_; }
-    void SetSelectState(int state) { selectState_ = state; }
+    void SetCurrentState(SceneTitle::STATE state) { currentState_ = static_cast<UINT>(state); }    
+    
+    // --- 選択していた値を保存しておく ---
     int GetSelectState() { return selectState_; }
+    void SetSelectState(int state) { selectState_ = state; }
 
+    // ----- シーン切り替え用 -----
+    bool GetIsReady() { return nextScene_->IsReady(); }
+    void ChangeScene();
+#pragma endregion// [Get,Set]Function
 private:
-    // ステートマシン
-    std::unique_ptr<StateMachine<State<SceneTitle>>> stateMachine_ = nullptr;
-    int currentState_ = 0;  // 現在のステート
-    int selectState_ = 0;   // 選択してた物を保持するための変数
+
     
 public:// ステートマシンで触るためにpublicで定義
-    std::unique_ptr<Sprite> titleLogoSprite_;
-    std::unique_ptr<Sprite> pressAnyButtonSprite_;
-    std::unique_ptr<Sprite> loadGameSprite_;
-    std::unique_ptr<Sprite> quitGameSprite_;
-    std::unique_ptr<Sprite> blackBeltSprite_;
-    std::unique_ptr<Sprite> quitGameWordSprite_;
-    std::unique_ptr<Sprite> loadGameWordSprite_;
-    std::unique_ptr<Sprite> choseSprite_;
+    std::unique_ptr<Sprite> titleLogoSprite_;       // Emma
+    std::unique_ptr<Sprite> pressAnyButtonSprite_;  // PressAnyButton
+    std::unique_ptr<Sprite> loadGameSprite_;        // LoadGame
+    std::unique_ptr<Sprite> quitGameSprite_;        // QuitGame
+    std::unique_ptr<Sprite> blackBeltSprite_;       // 文字の下に表示する
+    std::unique_ptr<Sprite> quitGameWordSprite_;    // ゲームを終了しますか？
+    std::unique_ptr<Sprite> choseSprite_;           // カーソル (アニメーション)
 
+private:// メンバ変数
+    // ---------- ステートマシン ----------------------------------------
+    std::unique_ptr<StateMachine<State<SceneTitle>>> stateMachine_ = nullptr;
+    int currentState_   = 0; // 現在のステート
+    int selectState_    = 0; // 選択してた物を保持するための変数
+    // -----------------------------------------------------------------
 
-private:// シェーダー関連
-#pragma region Shader
-    std::unique_ptr<FrameBuffer> frameBuffer_;
+    // ---------- シェーダー --------------------------------------------
+    // --- framebuffer ---
+    std::unique_ptr<FrameBuffer>    frameBuffer_;
     std::unique_ptr<FullscreenQuad> bitBlockTransfer_;
 
-    std::unique_ptr<Bloom> bloom_;
+    // --- bloom ---
+    std::unique_ptr<Bloom>                    bloom_;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> bloomPS_;
 
+    // --- sprite ---
     Microsoft::WRL::ComPtr<ID3D11PixelShader> spriteEmissivePS_;
-#pragma endregion// Shader
+    // -----------------------------------------------------------------
+
+private:// スレッド関係
+    static void LoadingThread(SceneTitle* scene);
+    BaseScene* nextScene_   = nullptr;
+    std::thread* thread_    = nullptr;
 };
 

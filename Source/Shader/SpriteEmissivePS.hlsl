@@ -1,4 +1,4 @@
-#include "sprite_dissolve.hlsli"
+#include "SpriteDissolve.hlsli"
 
 cbuffer EMISSICE_CONSTANTS : register(b6)
 {
@@ -9,7 +9,7 @@ cbuffer EMISSICE_CONSTANTS : register(b6)
 Texture2D colorMap : register(t0);
 SamplerState samplerState : register(s0);
 
-float4 main(VS_OUT psIn) : SV_TARGET
+float4 main(PSIn psIn) : SV_TARGET
 {    
     float4 color = colorMap.Sample(samplerState, psIn.texcoord);
     float alpha = color.a;

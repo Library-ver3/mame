@@ -9,6 +9,11 @@
 
 #include "../Game/Character/PlayerManager.h"
 
+#include "../Scene/SceneManager.h"
+#include "../Scene/SceneTitle.h"
+#include "../Scene/SceneLoadGame.h"
+#include "../Scene/SceneLoading.h"
+
 // リソース生成
 void SceneGame::CreateResource()
 {
@@ -37,6 +42,11 @@ void SceneGame::Finalize()
 // 更新処理
 void SceneGame::Update(const float& elapsedTime)
 {
+    if (GetAsyncKeyState('P') & 0x01)
+    {
+        SceneManager::Instance().ChangeScene(new SceneLoading(new SceneTitle(new SceneLoadGame)));
+    }
+
     if (GetAsyncKeyState('U') & 0x01)isDebugCamera = !isDebugCamera;
     if (isDebugCamera)
     {

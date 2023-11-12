@@ -4,6 +4,20 @@
 
 namespace SceneTitleState
 {
+    class FadeInState : public State<SceneTitle>
+    {
+    public:
+        FadeInState(SceneTitle* sceneTitle) : State(sceneTitle, "FadeInState") {}
+        ~FadeInState() {}
+
+        void Initialize()                       override;
+        void Update(const float& elapsedTime)   override;
+        void Finalize()                         override;
+
+    private:
+        float easingTimer_ = 0.0f;
+    };
+
     class PressAnyButtonState : public State<SceneTitle>
     {
     public:
@@ -97,10 +111,25 @@ namespace SceneTitleState
     private:
         bool isChose_ = false;
         bool isPlayAnimation_ = false;
-        bool isButtonPush = false;
         int currentState_ = 0;
         float easingTimer_ = 0.0f;
         float animationTimer_ = 0.0f;
+    };
+
+    class LoadGameFadeOut : public State<SceneTitle>
+    {
+    public:
+        LoadGameFadeOut(SceneTitle* sceneTitle) : State(sceneTitle, "LoadGameFadeOut") {}
+        ~LoadGameFadeOut() {}
+
+        void Initialize()                       override;
+        void Update(const float& elapsedTime)   override;
+        void Finalize()                         override;
+
+    private:
+        float easingTimer_ = 0.0f;
+        float delayTimer_ = 0.0f;
+        bool isChangeScene_ = false;
     };
 }
 

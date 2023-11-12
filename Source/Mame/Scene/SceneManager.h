@@ -1,37 +1,33 @@
 #pragma once
 #include "BaseScene.h"
 
-namespace Mame::Scene
+class SceneManager
 {
+private:
+    SceneManager() {}
+    ~SceneManager() {}
 
-    class SceneManager
+public:
+    static SceneManager& Instance()
     {
-    private:
-        SceneManager() {}
-        ~SceneManager() {}
+        static SceneManager instance;
+        return instance;
+    }
 
-    public:
-        static SceneManager& Instance()
-        {
-            static SceneManager instance;
-            return instance;
-        }
+    void Initialize();
+    void Update(float elapesdTime);  // 更新処理
+    void Render();                  // 描画処理
 
-        void Initialize();
-        void Update(float elapesdTime);  // 更新処理
-        void Render();                  // 描画処理
+    void DrawDebug();
 
-        void DrawDebug();
+    void Clear();   // シーンクリア
 
-        void Clear();   // シーンクリア
+    // シーン切り替え
+    void ChangeScene(BaseScene* scene);
 
-        // シーン切り替え
-        void ChangeScene(BaseScene* scene);
+    BaseScene* GetCurrentScene()const { return currentScene; }
 
-        BaseScene* GetCurrentScene()const { return currentScene; }
-
-    private:
-        BaseScene* currentScene = nullptr;
-        BaseScene* nextScene = nullptr;
-    };
-}
+private:
+    BaseScene* currentScene = nullptr;
+    BaseScene* nextScene = nullptr;
+};

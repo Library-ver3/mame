@@ -161,6 +161,9 @@ Shader::Shader(ID3D11Device* device)
 
         // emissive
         emissiveConstants_ = std::make_unique<ConstantBuffer<EmissiceConstants>>(device);
+
+        // dissolve
+        dissolveConstants_ = std::make_unique<ConstantBuffer<DissolveConstants>>(device);
     }
 
     // ブレンドステート
@@ -599,6 +602,11 @@ void Shader::UpdateFogConstants(int slot)
 void Shader::UpdateEmissiveConstants(int slot)
 {   // emissive
     emissiveConstants_->Activate(Graphics::Instance().GetDeviceContext(), slot, false, true);
+}
+
+void Shader::UpdateDissolveConstants(int slot)
+{   // dissolve
+    dissolveConstants_->Activate(Graphics::Instance().GetDeviceContext(), slot, false, true);
 }
 
 

@@ -47,10 +47,10 @@ bool framework::initialize()
     audioManager.StopAllAudio(); // 全音楽停止
 
     // シーン
-    Mame::Scene::SceneManager::Instance().Initialize();
-    //Mame::Scene::SceneManager::Instance().ChangeScene(new SceneTitle);
-    //Mame::Scene::SceneManager::Instance().ChangeScene(new SceneGame);
-    Mame::Scene::SceneManager::Instance().ChangeScene(new SceneLoadGame);
+    SceneManager::Instance().Initialize();
+    SceneManager::Instance().ChangeScene(new SceneTitle(new SceneLoadGame));
+    //SceneManager::Instance().ChangeScene(new SceneGame);
+    //SceneManager::Instance().ChangeScene(new SceneLoadGame);
     
 #ifndef _DEBUG
     ShowCursor(!FULLSCREEN);	// フルスクリーン時はカーソルを消す
@@ -69,7 +69,7 @@ void framework::update(float elapsed_time/*Elapsed seconds from last frame*/)
     input.Update();
 
     // シーン更新処理
-    Mame::Scene::SceneManager::Instance().Update(elapsed_time);
+    SceneManager::Instance().Update(elapsed_time);
 
     // シーン内でゲーム終了させるための処理
     if (isGameEnd_)
@@ -86,7 +86,7 @@ void framework::render()
     graphics.GetShader()->SetSamplerState(graphics.GetDeviceContext());
 
     // シーン描画
-    Mame::Scene::SceneManager::Instance().Render();
+    SceneManager::Instance().Render();
 
     // ImGui表示
     IMGUI_CTRL_DISPLAY();
@@ -98,7 +98,7 @@ void framework::render()
 bool framework::uninitialize()
 {
     // シーン終了化
-    Mame::Scene::SceneManager::Instance().Clear();
+    SceneManager::Instance().Clear();
 
     return false;
 }

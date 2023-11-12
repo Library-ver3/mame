@@ -1,4 +1,4 @@
-struct VS_OUT
+struct PSIn
 {
     float4 position : SV_POSITION;
     float4 color : COLOR;
@@ -13,8 +13,9 @@ cbuffer SCENE_CONSTANT_BUFFER : register(b1)
 
 cbuffer DISSOLVE_CONSTANT_BUFFER : register(b3)
 {
-    float4 parameters;      // x: ディゾルブ適応量
-                            // y: 黒色
-                            // zw: 空き
+    float4 parameters;  // x:ディゾルブ適応量、
+                        // y
+                        // z: 縁の閾値
+                        // w:空き
     float4 edgeColor;   // 縁の色
 }

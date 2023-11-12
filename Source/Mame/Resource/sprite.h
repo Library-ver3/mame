@@ -45,6 +45,11 @@ public:
         float GetPosY() { return position_.y; }
 
         void SetPos(const DirectX::XMFLOAT2& pos) { position_ = pos; }
+        void SetPos(const float& x, const float& y) 
+        {
+            position_.x = x;
+            position_.y = y;
+        }
         void SetPosX(const float& posX) { position_.x = posX; }
         void SetPosY(const float& posY) { position_.y = posY; }
 
@@ -70,6 +75,11 @@ public:
         float GetSizeY() { return size_.y; }
 
         void SetSize(const DirectX::XMFLOAT2& size) { size_ = size; }
+        void SetSize(const float& x, const float& y)
+        {
+            size_.x = x;
+            size_.y = y;
+        }
         void SetSizeX(const float& sizeX) { size_.x = sizeX; }
         void SetSizeY(const float& sizeY) { size_.y = sizeY; }
         void SetSize(const float& size) { size_ = { size,size }; }
@@ -82,6 +92,19 @@ public:
         float GetColorA() { return color_.w; }
 
         void SetColor(const DirectX::XMFLOAT4& color) { color_ = color; }
+        void SetColor(const float& r, const float& g, const float& b, const float& a)
+        {
+            color_.x = r;
+            color_.y = g;
+            color_.z = b;
+            color_.w = a;
+        }
+        void SetColor(const float& r, const float& g, const float& b)
+        {
+            color_.x = r;
+            color_.y = g;
+            color_.z = b;
+        }
         void SetColorR(const float& r) { color_.x = r; }
         void SetColorG(const float& g) { color_.y = g; }
         void SetColorB(const float& b) { color_.z = b; }
@@ -102,6 +125,11 @@ public:
         float GetTexPosY() { return texPos_.y; }
 
         void SetTexPos(const DirectX::XMFLOAT2& texPos) { texPos_ = texPos; }
+        void SetTexPos(const float& texPosX, const float& texPosY)
+        {
+            texPos_.x = texPosX;
+            texPos_.y = texPosY;
+        }
         void SetTexPosX(const float& texPosX) { texPos_.x = texPosX; }
         void SetTexPosY(const float& texPosY) { texPos_.y = texPosY; }
 
@@ -111,6 +139,11 @@ public:
         float GetTexSizeY() { return texSize_.y; }
 
         void SetTexSize(const DirectX::XMFLOAT2& texSize) { texSize_ = texSize; }
+        void SetTexSize(const float& texSizeX, const float& texSizeY)
+        {
+            texSize_.x = texSizeX;
+            texSize_.y = texSizeY;
+        }
         void SetTexSizeX(const float& texSizeX) { texSize_.x = texSizeX; }
         void SetTexSizeY(const float& texSizeY) { texSize_.y = texSizeY; }
     };
@@ -202,6 +235,8 @@ public:
     static DirectX::XMFLOAT2 ConvertToScreenPos(const DirectX::XMFLOAT3 worldPos, bool* isDraw = nullptr); // isDrawÅFï`âÊÇ∑ÇÈÇ©
 
     void Render(ID3D11PixelShader* psShader = nullptr, const char* type = "");
+
+    void SetConstantBuffer(const char* type);
 
     void DrawDebug();
 

@@ -155,10 +155,17 @@ public:
         DirectX::XMFLOAT3 dummy{};
     };
 
+    struct DissolveConstants
+    {
+        DirectX::XMFLOAT4 parameters = { 1, 1, 1, 1 };
+        DirectX::XMFLOAT4 edgeColor = { 1, 1, 1, 1 };
+    };
+
 private:// Constants
     std::unique_ptr<ConstantBuffer<FogConstants>> fogConstants_;                // fog
     std::unique_ptr<ConstantBuffer<PostEffectConstants>> postEffectConstants_;  // postEffect
     std::unique_ptr<ConstantBuffer<EmissiceConstants>> emissiveConstants_;      // emissive
+    std::unique_ptr<ConstantBuffer<DissolveConstants>> dissolveConstants_;      // dissolve
 
 public:
     Shader(ID3D11Device* device);
@@ -171,12 +178,17 @@ public:// 定数バッファー [Update. Get. Set]
     void UpdatePostEffectConstants(int slot);
     void UpdateFogConstants(int slot);
     void UpdateEmissiveConstants(int slot);
+    void UpdateDissolveConstants(int slot);
 #pragma endregion// UpdateConstants
 
 #pragma region [Get,Set]Function
     // ----- Emissive -----
     void SetEmissiveColor(DirectX::XMFLOAT4 color) { emissiveConstants_->data.emissiceColor_ = color; }
     void SetEmissiveIntensity(float intensity) { emissiveConstants_->data.emissiveIntensity = intensity; }
+
+    // ----- Dissolve -----
+    void SetDissolveIntensity(float intensity) { dissolveConstants_->data.parameters.x = intensity; }
+
 #pragma endregion[Get,Set]Function
 
 public:// 各種ステート設定
