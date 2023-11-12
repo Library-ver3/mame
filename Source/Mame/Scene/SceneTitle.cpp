@@ -225,6 +225,10 @@ void SceneTitle::DrawDebug()
 {
     ImGui::Begin("SceneTitle");
 
+    Mouse& mouse = Input::Instance().GetMouse();
+    DirectX::XMFLOAT2 mousePos = { static_cast<float>(mouse.GetPositionX()), static_cast<float>(mouse.GetPositionY()) };
+    ImGui::InputFloat2("mouse", &mousePos.x);
+
     titleLogoSprite_->DrawDebug();
     blackBeltSprite_->DrawDebug();
     choseSprite_->DrawDebug();

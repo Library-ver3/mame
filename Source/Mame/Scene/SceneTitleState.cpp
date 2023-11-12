@@ -66,7 +66,9 @@ namespace SceneTitleState
     void PressAnyButtonState::Update(const float& elapsedTime)
     {
         GamePad& gamePad = Input::Instance().GetGamePad();
+        Mouse& mouse = Input::Instance().GetMouse();
 
+#pragma region ボタン入力
         const GamePadButton anyButton =
             GamePad::BTN_UP
             | GamePad::BTN_RIGHT
@@ -89,14 +91,34 @@ namespace SceneTitleState
             | GetAsyncKeyState('S')
             | GetAsyncKeyState('D');
 
+        auto anyMouse =
+            Mouse::BTN_LEFT
+            | Mouse::BTN_MIDDLE
+            | Mouse::BTN_RIGHT;
+
         // ボタンが押されたら
-        if (((gamePad.GetButtonDown() & anyButton) || anyKey))
+        if (((gamePad.GetButtonDown() & anyButton)
+            || anyKey
+            || (mouse.GetButtonDown() & anyMouse)))
         {   // 明るさを上げて、次のステートへ
             owner->pressAnyButtonSprite_->GetEmissive()->SetEmissiveIntensity(1.0f);
             owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::PressAnyButtonFadeOut));
             return;
         }
+#pragma endregion// ボタン入力
 
+        // 点滅更新
+        UpdateSprite(elapsedTime);
+    }
+
+    // 終了化
+    void PressAnyButtonState::Finalize()
+    {
+    }
+
+    // 点滅更新
+    void PressAnyButtonState::UpdateSprite(const float& elapsedTime)
+    {
         float maxTime = 0.7f;
         float maxBrightness = 0.4f;
         float minBrightness = -0.15f;
@@ -134,11 +156,6 @@ namespace SceneTitleState
                 easingTimer_ = 0.0f;
             }
         }
-    }
-
-    // 終了化
-    void PressAnyButtonState::Finalize()
-    {
     }
 }
 
@@ -267,9 +284,11 @@ namespace SceneTitleState
     void SelectState::Update(const float& elapsedTime)
     {
         GamePad& gamePad = Input::Instance().GetGamePad();
+        Mouse& mouse = Input::Instance().GetMouse();
 
-        // Bボタン
-        if (gamePad.GetButtonDown() & GamePad::BTN_B)
+        // Bボタン or 右クリック
+        if ((gamePad.GetButtonDown() & GamePad::BTN_B)
+            || (mouse.GetButtonDown() & Mouse::BTN_RIGHT))
         {   // PressAnyButtonに戻る
             owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::PressAnyButton));
             return;
@@ -294,61 +313,112 @@ namespace SceneTitleState
 
         float stick = 0.8f;
 
+        Mouse& mouse = Input::Instance().GetMouse();
+        DirectX::XMFLOAT2 mousePos = { static_cast<float>(mouse.GetPositionX()), static_cast<float>(mouse.GetPositionY()) };
+
+#pragma region マウスによる選択
+        // ---------- マウスのカーソルに位置によってステートを変更 ----------
+
+        // --- LoadGameを選択 ---
+        if ((mousePos.x > mousePos_[0].left_) && (mousePos.x < mousePos_[0].right_) && (mousePos.y > mousePos_[0].top_) && (mousePos.y < mousePos_[0].bottom_))
+        {
+            ChangeCurrentState(STATE::LoadGame);
+        }
+        // --- QuitGameを選択 ---
+        if ((mousePos.x > mousePos_[1].left_) && (mousePos.x < mousePos_[1].right_) && (mousePos.y > mousePos_[1].top_) && (mousePos.y < mousePos_[1].bottom_))
+        {
+            ChangeCurrentState(STATE::QuitGame);
+        }
+
+        // ---------- マウスクリックによる選択 ----------
+
+        // --- LoadGameを選択 ---
+        if (((mousePos.x > mousePos_[0].left_) && (mousePos.x < mousePos_[0].right_) && (mousePos.y > mousePos_[0].top_) && (mousePos.y < mousePos_[0].bottom_))
+            && (mouse.GetButtonDown() & Mouse::BTN_LEFT))
+        {
+            owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::LoadGameFadeOut));
+            return;
+        }
+        // --- QuitGameを選択 ---
+        if (((mousePos.x > mousePos_[1].left_) && (mousePos.x < mousePos_[1].right_) && (mousePos.y > mousePos_[1].top_) && (mousePos.y < mousePos_[1].bottom_))
+            && (mouse.GetButtonDown() & Mouse::BTN_LEFT))
+        {
+            owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::QuitGameChose));
+            return;
+        }
+
+#pragma endregion// マウスによる選択
+
+#pragma region ゲームパッドによる選択 (keyboard)
+        // ---------- 入力によるステート変更 ----------
         switch (currentState_)
         {
         case static_cast<UINT>(STATE::LoadGame):
+            // --- LoadGame ---
             if ((aLY > stick) && isChangeState_)
             {   // スティックを上に傾けた
-                isChangeState_ = false;
-                currentState_ = static_cast<UINT>(STATE::QuitGame);
-                owner->SetSelectState(currentState_);
+                ChangeCurrentState(STATE::LoadGame);
                 break;
             }
             if ((aLY < -stick) && isChangeState_)
             {   // スティックを下に傾けた
-                isChangeState_ = false;
-                currentState_ = static_cast<UINT>(STATE::QuitGame);
-                owner->SetSelectState(currentState_);
+                ChangeCurrentState(STATE::QuitGame);
                 break;
             }
 
-            // ゲーム選択
+            break;
+        case static_cast<UINT>(STATE::QuitGame):
+            // --- QuitGame ---
+            if ((aLY > stick) && isChangeState_)
+            {   // スティックを上に傾けた
+                ChangeCurrentState(STATE::LoadGame);
+                break;
+            }
+            if ((aLY < -stick) && isChangeState_)
+            {   // スティックを下に傾けた
+                ChangeCurrentState(STATE::QuitGame);
+                break;
+            }
+
+            break;
+        }
+
+        // ---------- ボタン入力による選択 ----------
+        switch (currentState_)
+        {
+        case static_cast<UINT>(STATE::LoadGame):
+            // --- LoadGame ---
             if (gamePad.GetButtonDown() & GamePad::BTN_A)
-            {
+            {   // ゲーム選択
                 owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::LoadGameFadeOut));
                 return;
             }
 
-            owner->loadGameSprite_->GetEmissive()->SetEmissiveIntensity(
-                UpdateBrightness(elapsedTime, "LoadGame"));
-            owner->quitGameSprite_->GetEmissive()->SetEmissiveIntensity(minBrightness);
-
-
-
             break;
         case static_cast<UINT>(STATE::QuitGame):
-            if ((aLY > stick) && isChangeState_)
-            {   // スティックを上に傾けた
-                isChangeState_ = false;
-                currentState_ = static_cast<UINT>(STATE::LoadGame);
-                owner->SetSelectState(currentState_);
-                break;
-            }
-            if ((aLY < -stick) && isChangeState_)
-            {   // スティックを下に傾けた
-                isChangeState_ = false;
-                currentState_ = static_cast<UINT>(STATE::LoadGame);
-                owner->SetSelectState(currentState_);
-                break;
-            }
-
-            // 選択した
+            // --- QuitGame ---
             if (gamePad.GetButtonDown() & GamePad::BTN_A)
-            {
+            {   // 選択した
                 owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::QuitGameChose));
                 return;
             }
 
+            break;
+        }
+#pragma endregion// ゲームパッドによる選択 (keyboard)
+
+        // ---------- 点滅更新 (分岐) ----------
+        switch (currentState_)
+        {
+        case static_cast<UINT>(STATE::LoadGame):
+            // --- LoadGame ---
+            owner->quitGameSprite_->GetEmissive()->SetEmissiveIntensity(minBrightness);
+            owner->loadGameSprite_->GetEmissive()->SetEmissiveIntensity(
+                UpdateBrightness(elapsedTime, "LoadGame"));
+
+            break;
+        case static_cast<UINT>(STATE::QuitGame):
+            // --- QuitGame ---
             owner->loadGameSprite_->GetEmissive()->SetEmissiveIntensity(minBrightness);
             owner->quitGameSprite_->GetEmissive()->SetEmissiveIntensity(
                 UpdateBrightness(elapsedTime, "QuitGame"));
@@ -356,6 +426,7 @@ namespace SceneTitleState
             break;
         }
 
+        // ---------- 連続して選択できると操作性が悪いのでbreakTimeを設ける ----------
         if (isChangeState_)
         {
             breakTimer_ = 0.0f;
@@ -422,6 +493,14 @@ namespace SceneTitleState
             return owner->quitGameSprite_->GetEmissive()->GetEmissiveIntensity();
         }
         return isBrightnessUp_ ? maxBrightness : minBrightness;
+    }
+
+    // ステート切り替え用
+    void SelectState::ChangeCurrentState(STATE state)
+    {
+        isChangeState_ = false;
+        currentState_ = static_cast<UINT>(state);
+        owner->SetSelectState(currentState_);
     }
 }
 

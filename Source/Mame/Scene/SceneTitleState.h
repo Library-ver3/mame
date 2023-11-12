@@ -28,6 +28,8 @@ namespace SceneTitleState
         void Update(const float& elapsedTime)   override;
         void Finalize()                         override;
 
+        void UpdateSprite(const float& elapsedTime);
+
     private:
         float easingTimer_ = 0.0f;
         bool isBrightnessUp_ = false;
@@ -63,6 +65,25 @@ namespace SceneTitleState
 
     class SelectState : public State<SceneTitle>
     {
+    private:// íËêî
+        enum class STATE
+        {
+            LoadGame,
+            QuitGame,
+        };
+
+        struct MousePos
+        {
+            float top_;
+            float bottom_;
+            float left_;
+            float right_;
+        }mousePos_[2] =
+        {
+            { 420.0f, 470.0f, 410.0f, 870.0f },
+            { 470.0f, 520.0f, 410.0f, 870.0f },
+        };
+
     public:
         SelectState(SceneTitle* sceneTitle) : State(sceneTitle, "SelectState") {}
         ~SelectState() {}
@@ -74,12 +95,7 @@ namespace SceneTitleState
         void UpdateState(const float& elapsedTime);
         float UpdateBrightness(const float& elapsedTime, const char* who);
 
-    private:// íËêî
-        enum class STATE
-        {
-            LoadGame,
-            QuitGame,
-        };
+        void ChangeCurrentState(STATE state);
 
     private:
         float easingTimer_ = 0.0f;
