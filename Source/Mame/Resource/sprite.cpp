@@ -393,6 +393,18 @@ void Sprite::SpriteTransform::DrawDebug()
     {
         ImGui::DragFloat2("pos", &position_.x);
         ImGui::DragFloat2("size", &size_.x);
+
+        if (ImGui::Button("isSizeFactor"))
+        {
+            isSizeFactor_ = !isSizeFactor_;
+        }
+        if (isSizeFactor_)
+        {
+            float sizeFactor = size_.x;
+            ImGui::DragFloat("sizeFactor", &sizeFactor);
+            SetSize(sizeFactor);
+        }
+
         ImGui::ColorEdit4("color", &color_.x);
         ImGui::DragFloat("angle", &angle_);
         ImGui::DragFloat2("texPos", &texPos_.x);

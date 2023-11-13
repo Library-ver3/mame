@@ -12,11 +12,18 @@ namespace PlayerState
     // 初期化
     void IdleState::Initialize()
     {
+        
     }
 
     // 更新
     void IdleState::Update(const float& elapsedTime)
     {
+        GamePad& gamePad = Input::Instance().GetGamePad();
+
+        float ax = gamePad.GetAxisLX();
+        float ay = gamePad.GetAxisLY();
+
+        owner->MoveUpdate(elapsedTime);
     }
 
     // 終了化
@@ -33,6 +40,7 @@ namespace PlayerState
     // 初期化
     void WalkState::Initialize()
     {
+        owner->PlayWalkAnimation();
     }
 
     // 更新

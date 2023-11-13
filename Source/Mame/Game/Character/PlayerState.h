@@ -32,7 +32,7 @@ namespace PlayerState
 
 
 #pragma region JumpState
-    class JumpState : State<Player>
+    class JumpState : public State<Player>
     {
     public:
         JumpState(Player* player) : State(player, "Jump") {}

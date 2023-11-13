@@ -17,5 +17,11 @@ public:// 基本的な関数 ( overrideしてる関数など )
     void DrawDebug()                            override; // ImGui用
 
     void UpdateConstants()                      override; // 定数バッファー更新
+
+public:
+    void Turn(const float& elapsedTime, float vx, float vz, float rotSpeed);
+
+private:
+    float rotationValue_ = 0.0f; // 回転量
 };
 

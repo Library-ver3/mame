@@ -14,7 +14,6 @@
 #include "SceneGame.h"
 
 SceneLoadGame::SceneLoadGame()
-    : loadingScene_(new SceneLoading(new SceneGame))
 {
 }
 
@@ -56,6 +55,22 @@ void SceneLoadGame::CreateResource()
             L"./Resources/Image/LoadGame/loadGameWord.png");
         choseSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
             L"./Resources/Image/UI/chose.png");
+
+        halfBlackBeltSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/UI/blackBelt.png");
+        loadingWordSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/LoadGame/loadingWord.png");
+        completeWordSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/LoadGame/complete.png");
+        loadArrowSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/LoadGame/arrow.png");
+
+        choseLoadDataWordSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/LoadGame/choseLoadDataWord.png");
+        pointWakuSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/UI/waku.png");
+        pointRhombusSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/UI/rhombus.png");
     }
 
     // ステートマシン
@@ -68,6 +83,7 @@ void SceneLoadGame::CreateResource()
         GetStateMachine()->RegisterState(new SceneLoadGameState::SlideUiFadeOutState(this));
         GetStateMachine()->RegisterState(new SceneLoadGameState::LoadGameState(this));
         GetStateMachine()->RegisterState(new SceneLoadGameState::LoadTitleState(this));
+        GetStateMachine()->RegisterState(new SceneLoadGameState::ChangeSceneState(this));
 
         GetStateMachine()->SetState(static_cast<UINT>(STATE::SlideUi));
     }
@@ -108,6 +124,19 @@ void SceneLoadGame::Initialize()
         choseSprite_->GetSpriteTransform()->SetSize(DirectX::XMFLOAT2(100, 100));
         choseSprite_->GetSpriteTransform()->SetTexSize(DirectX::XMFLOAT2(100, 100));
 #pragma endregion// choseSprite_
+
+        halfBlackBeltSprite_->GetSpriteTransform()->SetPos(0, 180);
+        halfBlackBeltSprite_->GetSpriteTransform()->SetSize(1280, 380);
+
+        completeWordSprite_->GetSpriteTransform()->SetPos(0, 5);
+
+        loadArrowSprite_->GetSpriteTransform()->SetPos(625, 395);
+        loadArrowSprite_->GetSpriteTransform()->SetSize(36, 36);
+
+        pointWakuSprite_->GetSpriteTransform()->SetPos(105, 85);
+        pointWakuSprite_->GetSpriteTransform()->SetSize(60, 60);
+        pointRhombusSprite_->GetSpriteTransform()->SetPos(105, 85);
+        pointRhombusSprite_->GetSpriteTransform()->SetSize(60, 60);
     }
 
     // 変数初期化
@@ -115,8 +144,8 @@ void SceneLoadGame::Initialize()
     isFadeIn_ = true;
     isFadeOut_ = false;
 
-    // スレッド
-    thread_ = new std::thread(LoadingThread, this);
+    isPointExpansion_ = false;
+    pointTimer_ = 0.0f;
 }
 
 // 終了化
@@ -136,6 +165,8 @@ void SceneLoadGame::Update(const float& elapsedTime)
 {
     // ステートマシン更新
     GetStateMachine()->Update(elapsedTime);
+
+    UpdatePointRhombusSprite(elapsedTime);
 
     if (isFadeIn_ && !isFadeOut_)
     {   // フェードイン
@@ -158,7 +189,7 @@ void SceneLoadGame::Update(const float& elapsedTime)
         // ここでは処理書かない
     }
 
-    //SceneManager::Instance().ChangeScene(loadingScene_);
+
 }
 
 // 描画
@@ -213,6 +244,10 @@ void SceneLoadGame::Render()
         // マスク画像セット スロット3
         NoiseTexture::Instance().SetConstantBuffers(3);
 
+        choseLoadDataWordSprite_->Render();
+        pointWakuSprite_->Render();
+        pointRhombusSprite_->Render();
+
         // ※描画順に注意
         // base -> chose -> word
         {
@@ -237,6 +272,14 @@ void SceneLoadGame::Render()
             choseSprite_->Render();
             loadGameWordSprite_->Render();
         }
+
+        if (currentState_ == static_cast<UINT>(STATE::LoadGame))
+        {
+            halfBlackBeltSprite_->Render();
+            loadingWordSprite_->Render();
+            completeWordSprite_->Render();
+            loadArrowSprite_->Render();
+        }
     }
 
     // ----- これより下に何も書かない -----
@@ -259,6 +302,14 @@ void SceneLoadGame::DrawDebug()
         GetStateMachine()->ChangeState(static_cast<UINT>(STATE::SlideUi));
     }
 
+    Mouse& mouse = Input::Instance().GetMouse();
+    DirectX::XMFLOAT2 mousePos = { static_cast<float>(mouse.GetPositionX()), static_cast<float>(mouse.GetPositionY()) };
+    ImGui::InputFloat2("mouse", &mousePos.x);
+
+    choseLoadDataWordSprite_->DrawDebug();
+    pointWakuSprite_->DrawDebug();
+    pointRhombusSprite_->DrawDebug();
+
     bookSprite_->DrawDebug();
 
     gameDataChoseSprite_->DrawDebug();    
@@ -277,6 +328,60 @@ void SceneLoadGame::ChangeScene()
     if (loadingScene_->IsReady())
     {
         SceneManager::Instance().ChangeScene(loadingScene_);
+    }
+}
+
+// 点滅更新
+void SceneLoadGame::UpdatePointRhombusSprite(const float& elapsedTime)
+{
+    // UIがフェードイン。またはフェードアウトしているときは更新しない
+    if (GetCurrentState() == static_cast<UINT>(STATE::SlideUi)
+        || GetCurrentState() == static_cast<UINT>(STATE::SlideUiFadeOut)
+        || GetCurrentState() == static_cast<UINT>(STATE::LoadTitle))
+        return;
+
+    pointRhombusSprite_->GetSpriteTransform()->SetSpriteCenterPos(105, 85, 60);
+
+    float maxTime = 0.4f;
+    float maxSize = 70.0f;
+    float minSize = 45.0f;
+    float maxAlpha = 1.0f;
+    float minAlpha = 0.0f;
+    if (isPointExpansion_)
+    {
+        if (pointTimer_ <= maxTime)
+        {
+            float size = Easing::InSine(pointTimer_, maxTime, maxSize, minSize);
+            float alpha = Easing::InCubic(pointTimer_, maxTime, minAlpha, maxAlpha);
+
+            pointRhombusSprite_->GetSpriteTransform()->SetSize(size);
+            pointRhombusSprite_->GetSpriteTransform()->SetColorA(alpha);
+
+            pointTimer_ += elapsedTime;
+        }
+        else
+        {
+            pointTimer_ = 0.0f;
+            isPointExpansion_ = !isPointExpansion_;
+        }
+    }
+    else
+    {
+        if (pointTimer_ <= maxTime)
+        {
+            float size = Easing::InSine(pointTimer_, maxTime, minSize, maxSize);
+            float alpha = Easing::OutCubic(pointTimer_, maxTime, maxAlpha, minAlpha);
+
+            pointRhombusSprite_->GetSpriteTransform()->SetSize(size);
+            pointRhombusSprite_->GetSpriteTransform()->SetColorA(alpha);
+
+            pointTimer_ += elapsedTime;
+        }
+        else
+        {
+            pointTimer_ = 0.0f;
+            isPointExpansion_ = !isPointExpansion_;
+        }
     }
 }
 

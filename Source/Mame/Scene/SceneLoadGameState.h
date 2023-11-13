@@ -90,7 +90,10 @@ namespace SceneLoadGameState
         void Finalize()                         override;
 
     private:
+        float slideTimer_ = 0.0f;
         float easingTimer_ = 0.0f;
+
+        bool isFadeOut_ = false;
     };
 
     class LoadGameState : public State<SceneLoadGame>
@@ -102,6 +105,13 @@ namespace SceneLoadGameState
         void Initialize()                       override;
         void Update(const float& elapsedTime)   override;
         void Finalize()                         override;
+
+    private:
+        float loadingTimer_ = 0.0f;
+        float easingTimer_ = 0.0f;
+        bool isChangeState_ = false;
+
+        bool isCompleteFadeIn_ = false; // ゲームデータを読み込んでいます。表示完了
     };
 
     class LoadTitleState : public State<SceneLoadGame>
@@ -115,6 +125,20 @@ namespace SceneLoadGameState
         void Finalize()                         override;
 
     private:
+        float slideTimer_ = 0.0f;
         float easingTimer_ = 0.0f;
+
+        bool isFadeOut_ = false;
+    };
+
+    class ChangeSceneState : public State<SceneLoadGame>
+    {
+    public:
+        ChangeSceneState(SceneLoadGame* sceneLoadGame) : State(sceneLoadGame, "ChangeSceneState") {}
+        ~ChangeSceneState() {}
+
+        void Initialize()                       override;
+        void Update(const float& elapsedTime)   override;
+        void Finalize()                         override;
     };
 }

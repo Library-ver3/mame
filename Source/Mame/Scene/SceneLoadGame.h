@@ -29,6 +29,7 @@ public:// 定数
         SlideUiFadeOut,
         LoadGame,
         LoadTitle,
+        ChangeScene,
     };
 
     DirectX::XMFLOAT2 spritePos[3] =
@@ -52,6 +53,9 @@ public:// 基本的な関数
 
     void ChangeScene();
 
+private:
+    void UpdatePointRhombusSprite(const float& elapsedTime);
+
 public:// 取得・設定
     // ステートマシン
     StateMachine<State<SceneLoadGame>>* GetStateMachine() const { return stateMachine_.get(); }
@@ -73,14 +77,25 @@ public:// ステートマシンで触るために public
     std::unique_ptr<Sprite> loadGameWordSprite_;
     std::unique_ptr<Sprite> choseSprite_;
 
+    std::unique_ptr<Sprite> halfBlackBeltSprite_;
+    std::unique_ptr<Sprite> loadingWordSprite_;
+    std::unique_ptr<Sprite> completeWordSprite_;
+    std::unique_ptr<Sprite> loadArrowSprite_;
+
+    std::unique_ptr<Sprite> choseLoadDataWordSprite_;
+    std::unique_ptr<Sprite> pointWakuSprite_;
+    std::unique_ptr<Sprite> pointRhombusSprite_;
+
 private:
     std::unique_ptr<ConstantBuffer<Shader::SceneConstants>> sceneConstants_;
+    Microsoft::WRL::ComPtr<ID3D11PixelShader> spriteDissolvePS_;
     
     float fadeInTimer_ = 0.0f;
     bool isFadeIn_ = false;
     bool isFadeOut_ = false;
 
-    Microsoft::WRL::ComPtr<ID3D11PixelShader> spriteDissolvePS_;
+    bool isPointExpansion_ = false; // 膨張
+    float pointTimer_ = 0.0f;
 
 private:
     // ステートマシン
@@ -88,7 +103,7 @@ private:
     int currentState_ = 0;  // 現在のステート
     int selectState_ = 0;   // 選択した物を保持するための変数
 
-private:// スレッド関係
+public:// スレッド関係 // ステートマシンで触るために public
     static void LoadingThread(SceneLoadGame* scene);
     BaseScene* loadingScene_    = nullptr;
     std::thread* thread_        = nullptr;

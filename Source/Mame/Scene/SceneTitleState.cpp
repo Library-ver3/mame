@@ -523,6 +523,7 @@ namespace SceneTitleState
         isChose_ = false;
         isPlayAnimation_ = false;
         currentState_ = 0;
+        oldCurrentState_ = 0;
         easingTimer_ = 0.0f;
         animationTimer_ = 0.0f;
     }
@@ -533,73 +534,100 @@ namespace SceneTitleState
         GamePad& gamePad = Input::Instance().GetGamePad();
 
         if (!isChose_)
-        {   // blackBeltSprite_ fadeIn
-            float maxTime = 0.4f;
-            float maxAlpha = 0.91f;
-            if (easingTimer_ <= maxTime)
-            {   // 文字と黒い帯をフェイドインする
-                float alpha = Easing::InSine(easingTimer_, maxTime, maxAlpha, 0.0f);
-                float wordAlpha = Easing::InSine(easingTimer_, maxTime, 1.0f, 0.0f);
-
-                owner->blackBeltSprite_->GetSpriteTransform()->SetColorA(alpha);
-                owner->quitGameWordSprite_->GetSpriteTransform()->SetColorA(wordAlpha);
-
-                easingTimer_ += elapsedTime;
-            }
-            else
-            {   
-                // カラーを設定する
-                owner->blackBeltSprite_->GetSpriteTransform()->SetColorA(maxAlpha);
-                owner->quitGameWordSprite_->GetSpriteTransform()->SetColorA(1.0f);
-
-                easingTimer_ = 0.0f;
-                isChose_ = true;
-                return;
-            }
+        {   
+            // フェードイン
+            UpdateFadeIn(elapsedTime);
         }
         else
         {   // 選択 ( ゲーム終了 or もどる )
             float aLx = gamePad.GetAxisLX();
             
-#pragma region [はい,いいえ]を選択
+            Mouse& mouse = Input::Instance().GetMouse();
+            DirectX::XMFLOAT2 mousePos = { static_cast<float>(mouse.GetPositionX()), static_cast<float>(mouse.GetPositionY()) };
+
+            oldCurrentState_ = currentState_;
+
+#pragma region マウスによる選択
+            // ---------- マウスのカーソルに位置によってステートを変更 ----------
+
+            // --- はい を選択 ---
+            if ((mousePos.x > mousePos_[0].left_) && (mousePos.x < mousePos_[0].right_) && (mousePos.y > mousePos_[0].top_) && (mousePos.y < mousePos_[0].bottom_))
+            {
+                ChangeCurrentState(STATE::Yes);
+            }
+
+            // --- いいえ を選択 ---
+            if ((mousePos.x > mousePos_[1].left_) && (mousePos.x < mousePos_[1].right_) && (mousePos.y > mousePos_[1].top_) && (mousePos.y < mousePos_[1].bottom_))
+            {
+                ChangeCurrentState(STATE::No);
+            }
+
+            // ---------- マウスクリックによる選択 ----------
+
+            // --- はい を選択 ---
+            if (((mousePos.x > mousePos_[0].left_) && (mousePos.x < mousePos_[0].right_) && (mousePos.y > mousePos_[0].top_) && (mousePos.y < mousePos_[0].bottom_))
+                && (mouse.GetButtonDown() & Mouse::BTN_LEFT))
+            {   // ゲーム終了
+                framework::GameEnd();
+                return;
+            }
+
+            // --- いいえ を選択 ---
+            if (((mousePos.x > mousePos_[1].left_) && (mousePos.x < mousePos_[1].right_) && (mousePos.y > mousePos_[1].top_) && (mousePos.y < mousePos_[1].bottom_))
+                && (mouse.GetButtonDown() & Mouse::BTN_LEFT))
+            {   // selectに戻る
+                owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::Select));
+                return;
+            }
+#pragma endregion// マウスによる選択
+
+#pragma region ゲームパッドによる選択 (keyboard)
+            // ---------- 入力によるステート変更 ----------
+
             if (currentState_ == static_cast<UINT>(STATE::Yes))
             {   // [はい] にカーソルがある
+                // --- Bボタンを押したら「いいえ」に飛ばす ---
                 if (gamePad.GetButtonDown() & GamePad::BTN_B)
                 {
-                    easingTimer_ = 0.0f;
-                    isPlayAnimation_ = false;
-                    owner->choseSprite_->ResetAnimation();
-                    owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
-
-                    currentState_ = static_cast<UINT>(STATE::No);
-                    return;
+                    ChangeCurrentState(STATE::No);
                 }
 
+                // --- スティックの傾きによるステート変更 ---
                 if (aLx > 0.8f)
                 {
-                    easingTimer_ = 0.0f;
-                    isPlayAnimation_ = false;
-                    owner->choseSprite_->ResetAnimation();
-                    owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
-
-                    currentState_ = static_cast<UINT>(STATE::No);
-                    return;
+                    ChangeCurrentState(STATE::No);
                 }
             }
-            else
-            {
+
+            if (currentState_ == static_cast<UINT>(STATE::No))
+            {   // [いいえ] にカーソルがある
+                // --- スティックの傾きによるステート変更 ---
                 if (aLx < -0.8f)
                 {
-                    easingTimer_ = 0.0f;
-                    isPlayAnimation_ = false;
-                    owner->choseSprite_->ResetAnimation();
-                    owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
+                    ChangeCurrentState(STATE::Yes);
+                }
+            }
 
-                    currentState_ = static_cast<UINT>(STATE::Yes);
+            // ---------- ボタン入力による選択 ----------
+            if (currentState_ == static_cast<UINT>(STATE::Yes))
+            {   // ゲーム終了
+                if (gamePad.GetButtonDown() & GamePad::BTN_A)
+                {
+                    framework::GameEnd();
                     return;
                 }
             }
-#pragma endregion// [はい,いいえ]を選択
+            
+            if (currentState_ == static_cast<UINT>(STATE::No))
+            {   // selectに戻る
+                if (gamePad.GetButtonDown() & GamePad::BTN_A)
+                {
+                    owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::Select));
+                    return;
+                }
+            }
+
+#pragma endregion// ゲームパッドによる選択 (keyboard)
 
 
             float maxTime = 0.2f;
@@ -629,28 +657,53 @@ namespace SceneTitleState
             {   // アニメーション再生
                 owner->choseSprite_->PlayAnimation(elapsedTime, 15.0f, 3, false);
             }
-
-
-            // ボタン押す処理
-            if (currentState_ == static_cast<UINT>(STATE::Yes))
-            {   // ゲーム終了
-                if (gamePad.GetButtonDown() & GamePad::BTN_A)
-                    framework::GameEnd();
-                return;
-            }
-            else
-            {   // selectに戻る
-                if (gamePad.GetButtonDown() & GamePad::BTN_A)
-                    owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneTitle::STATE::Select));
-                return;
-            }
-
         }
     }
 
     // 終了化
     void QuitGameChoseState::Finalize()
     {
+    }
+
+    // フェイドイン
+    void QuitGameChoseState::UpdateFadeIn(const float& elapsedTime)
+    {
+        float maxTime = 0.4f;
+        float maxAlpha = 0.91f;
+        if (easingTimer_ <= maxTime)
+        {   // 文字と黒い帯をフェイドインする
+            float alpha = Easing::InSine(easingTimer_, maxTime, maxAlpha, 0.0f);
+            float wordAlpha = Easing::InSine(easingTimer_, maxTime, 1.0f, 0.0f);
+
+            owner->blackBeltSprite_->GetSpriteTransform()->SetColorA(alpha);
+            owner->quitGameWordSprite_->GetSpriteTransform()->SetColorA(wordAlpha);
+
+            easingTimer_ += elapsedTime;
+        }
+        else
+        {
+            // カラーを設定する
+            owner->blackBeltSprite_->GetSpriteTransform()->SetColorA(maxAlpha);
+            owner->quitGameWordSprite_->GetSpriteTransform()->SetColorA(1.0f);
+
+            easingTimer_ = 0.0f;
+            isChose_ = true;
+            return;
+        }
+    }
+
+    // ステート変更
+    void QuitGameChoseState::ChangeCurrentState(STATE state)
+    {
+        // 今選択しているものと、新しく選択したものが同じなら処理しない
+        currentState_ = static_cast<UINT>(state);
+        if (currentState_ == oldCurrentState_) return;
+
+        easingTimer_ = 0.0f;
+        isPlayAnimation_ = false;
+        owner->choseSprite_->ResetAnimation();
+        owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
+
     }
 }
 

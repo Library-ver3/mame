@@ -47,6 +47,11 @@ public:
     // ----- 入力値をカメラから見たベクトルに変換する -----
     void ConvertToCameraMoveVec(float ax, float ay);
 
+    // ----- 汎用関数 -----
+    void PlayWalkAnimation() { PlayBlendAnimation(static_cast<UINT>(Animation::Idle), static_cast<UINT>(Animation::Dash), true); }
+
+    void MoveUpdate(const float& elapsedTime);
+
 public:// 取得・設定
     // ---------- Getter,Setter,etc... ----------
 #pragma region [Get,Set]Function

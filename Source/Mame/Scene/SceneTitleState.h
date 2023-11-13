@@ -109,6 +109,25 @@ namespace SceneTitleState
 
     class QuitGameChoseState : public State<SceneTitle>
     {
+    private:
+        enum class STATE
+        {
+            Yes,
+            No,
+        };
+
+        struct MousePos
+        {
+            float top_;
+            float bottom_;
+            float left_;
+            float right_;
+        }mousePos_[2] =
+        {
+            { 380.0f, 440.0f, 460.0f, 640.0f },
+            { 380.0f, 440.0f, 640.0f, 820.0f },
+        };
+
     public:
         QuitGameChoseState(SceneTitle* sceneTitle) : State(sceneTitle, "QuitGameChoseState") {}
         ~QuitGameChoseState() {}
@@ -117,17 +136,14 @@ namespace SceneTitleState
         void Update(const float& elapsedTime)   override;
         void Finalize()                         override;
 
-    private:
-        enum class STATE
-        {
-            Yes,
-            No,
-        };
+        void UpdateFadeIn(const float& elapsedTime);
+        void ChangeCurrentState(STATE state);
 
     private:
         bool isChose_ = false;
         bool isPlayAnimation_ = false;
         int currentState_ = 0;
+        int oldCurrentState_ = 0;
         float easingTimer_ = 0.0f;
         float animationTimer_ = 0.0f;
     };

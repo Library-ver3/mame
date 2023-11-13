@@ -7,6 +7,7 @@
 #include "../Scene/SceneManager.h"
 #include "../Scene/SceneLoading.h"
 #include "../Scene/SceneGame.h"
+#include "../Scene/SceneDummy.h"
 #include "../Scene/SceneLoadingBack.h"
 #include "../Scene/SceneTitle.h"
 
@@ -26,8 +27,8 @@ namespace SceneLoadGameState
     // 更新
     void SlideUiState::Update(const float& elapsedTime)
     {
-        float maxTime = 0.5f;
-        float startGameDataBase = -150.0f;
+        float maxTime = 0.4f;
+        float startGameDataBase = -1100.0f;
         float endGameDataBase = 125.0f;
         if (easingTimer_ <= maxTime)
         {
@@ -43,6 +44,12 @@ namespace SceneLoadGameState
 
             float bookSpritePosX = Easing::InSine(easingTimer_, maxTime, endGameDataBase - endGameDataBase, startGameDataBase - endGameDataBase);
             owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+            owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+
+            float pointPosX = Easing::InSine(easingTimer_, maxTime, endGameDataBase - 20.0f, startGameDataBase - 20.0f);
+            owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+            owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+
 
             easingTimer_ += elapsedTime;
         }
@@ -57,6 +64,10 @@ namespace SceneLoadGameState
             owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(endGameDataBase);
 
             owner->bookSprite_->GetSpriteTransform()->SetPosX(endGameDataBase - endGameDataBase);
+            owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(endGameDataBase - endGameDataBase);
+
+            owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(endGameDataBase - 20.0f);
+            owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(endGameDataBase - 20.0f);
 
             owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::Select));
             return;
@@ -75,6 +86,9 @@ namespace SceneLoadGameState
     // 初期化
     void SelectState::Initialize()
     {
+        // 現在のステートを設定
+        owner->SetCurrentState(SceneLoadGame::STATE::Select);
+
         // spriteリセット
         owner->gameDataChoseSprite_->GetSpriteDissolve()->SetDissolveValue(0.0f);
         owner->gameDataChoseSprite_->GetSpriteTransform()->SetColorA(1.0f);
@@ -93,6 +107,8 @@ namespace SceneLoadGameState
         // タイトルに戻る
         if (gamePad.GetButtonDown() & GamePad::BTN_B)
         {
+            owner->loadingScene_ = (new SceneLoading(new SceneDummy));
+            owner->thread_ = new std::thread(owner->LoadingThread, owner);
             owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::LoadTitle));
             return;
         }
@@ -272,8 +288,8 @@ namespace SceneLoadGameState
                 owner->choseSprite_->PlayAnimation(elapsedTime, 15.0f, 3, false);
             }
 
-
-                PushButton();
+            // ボタン押されるのまってる。
+            PushButton();
         }
 
     }
@@ -397,7 +413,7 @@ namespace SceneLoadGameState
                 owner->choseSprite_->GetSpriteTransform()->SetColorA(0.0f);
 
                 // 次のステートへ
-                owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::SlideUiFadeOut));
+                owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::LoadGame));
                 return;
 
 #if 0
@@ -441,53 +457,86 @@ namespace SceneLoadGameState
     // 初期化
     void SlideUiFadeOutState::Initialize()
     {
+        // 現在のステートを設定
+        owner->SetCurrentState(SceneLoadGame::STATE::SlideUiFadeOut);
 
         // 変数初期化
+        slideTimer_ = 0.0f;
         easingTimer_ = 0.0f;
+        isFadeOut_ = false;
     }
 
     // 更新
     void SlideUiFadeOutState::Update(const float& elapsedTime)
     {
-        float maxTime = 0.5f;
+#pragma region 画像を移動させる
+        float maxSlideTime = 0.2f;
         float beforePosX = 125.0f;
-        float afterPosX = -1000.0f;
+        float afterPosX = -1100.0f;
         
-        if (easingTimer_ <= maxTime)
+        if (!isFadeOut_)
         {
-            float spritePosX = Easing::InSine(easingTimer_, maxTime, afterPosX, beforePosX);
-
-            for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+            if (slideTimer_ <= maxSlideTime)
             {
-                owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
-                owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                float spritePosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX, beforePosX);
+
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                }
+
+                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(spritePosX);
+
+                float bookSpritePosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX - beforePosX, beforePosX - beforePosX);
+                owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+
+                float pointPosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX - 20.0f, beforePosX - 20.0f);
+                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+
+                slideTimer_ += elapsedTime;
             }
+            else
+            {
+                // Spriteを指定の位置に設定
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
+                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
+                }
+                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(afterPosX);
 
-            owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(spritePosX);
+                owner->bookSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
+                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
 
-            float bookSpritePosX = Easing::InSine(easingTimer_, maxTime, afterPosX - beforePosX, beforePosX - beforePosX);
-            owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(afterPosX - 20.0f);
+                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(afterPosX - 20.0f);
 
-            // フェードアウト
-            float alpha = Easing::InSine(easingTimer_, maxTime, 1.0f, 0.0f);
-            owner->whiteSprite_->GetSpriteTransform()->SetColorA(alpha);
-
-            easingTimer_ += elapsedTime;
+                isFadeOut_ = true;
+            }
         }
-        else
-        {
-            // Spriteを指定の位置に設定
-            for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
-            {
-                owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
-                owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
-            }
-            owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(afterPosX);
-            
-            owner->bookSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
+#pragma endregion// 画像を移動させる
 
-            // 次のステートへ
-            owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::LoadGame));
+        // フェードアウト
+        if (isFadeOut_)
+        {
+            float maxTime = 0.2f;
+            if (easingTimer_ <= maxTime)
+            {
+                float alpha = Easing::OutSine(easingTimer_, maxTime, 1.0f, 0.0f);
+
+                owner->whiteSprite_->GetSpriteTransform()->SetColorA(alpha);
+
+                easingTimer_ += elapsedTime;
+            }
+            else
+            {
+                // 次のステートへ
+                owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::ChangeScene));
+                return;
+            }
         }
 
     }
@@ -503,23 +552,110 @@ namespace SceneLoadGameState
 {
     // 初期化
     void LoadGameState::Initialize()
-    {        
-    }
-
-    // 更新
-    void LoadGameState::Update(const float& elapsedTime)
     {
+        // 現在のステートを設定
+        owner->SetCurrentState(SceneLoadGame::STATE::LoadGame);
+
+        // 選択したステートによってロードするデータを分ける
         switch (owner->GetSelectState())
         {
         case 0:
-            owner->ChangeScene();
-            //SceneManager::Instance().ChangeScene(new SceneLoading(new SceneGame));
+            owner->loadingScene_ = (new SceneLoading(new SceneGame));
             break;
         case 1:
             break;
         case 2:
             break;
         }
+
+        // スプライト初期化
+        owner->halfBlackBeltSprite_->GetSpriteTransform()->SetColorA(0.0f);
+        owner->loadingWordSprite_->GetSpriteTransform()->SetColorA(0.0f);
+        owner->completeWordSprite_->GetSpriteTransform()->SetColorA(0.0f);
+        owner->loadArrowSprite_->GetSpriteTransform()->SetColorA(0.0f);
+
+        // 変数初期化
+        loadingTimer_ = 0.0f;
+        easingTimer_ = 0.0f;
+        isChangeState_ = false;
+
+        isCompleteFadeIn_ = false;
+
+        // スレッド開始
+        owner->thread_ = new std::thread(owner->LoadingThread, owner);
+    }
+
+    // 更新
+    void LoadGameState::Update(const float& elapsedTime)
+    {
+        GamePad& gamePad = Input::Instance().GetGamePad();
+        Mouse& mouse = Input::Instance().GetMouse();
+
+        // 「ゲームデータを読み込んでいます。」を表示しきっていない。
+        // または、　ロードが終わっていない
+        if (!isCompleteFadeIn_
+            || !(owner->loadingScene_->IsReady()))
+        {
+            float maxTime = 0.3f;
+            if (loadingTimer_ <= maxTime)
+            {
+                float alpha = Easing::InSine(loadingTimer_, maxTime, 1.0f, 0.0f);
+
+                owner->halfBlackBeltSprite_->GetSpriteTransform()->SetColorA(alpha);
+                owner->loadingWordSprite_->GetSpriteTransform()->SetColorA(alpha);
+                owner->loadArrowSprite_->GetSpriteTransform()->SetColorA(alpha);
+
+                loadingTimer_ += elapsedTime;
+            }
+            else
+            {
+                owner->halfBlackBeltSprite_->GetSpriteTransform()->SetColorA(1.0f);
+                owner->loadingWordSprite_->GetSpriteTransform()->SetColorA(1.0f);
+                owner->loadArrowSprite_->GetSpriteTransform()->SetColorA(1.0f);
+
+                isCompleteFadeIn_ = true;
+            }
+
+        }
+        
+        // ロードの文字回転
+        owner->loadArrowSprite_->GetSpriteTransform()->AddAngle(360 * elapsedTime);
+
+
+        // ロードが完了
+        if (owner->loadingScene_->IsReady())
+        {
+            owner->loadingWordSprite_->GetSpriteTransform()->SetColorA(0.0f);
+            owner->loadArrowSprite_->GetSpriteTransform()->SetColorA(0.0f);
+
+            // フェードイン
+            float maxTime = 0.5f;
+            if (easingTimer_ <= maxTime)
+            {
+                float alpha = Easing::InSine(easingTimer_, maxTime, 1.0f, 0.0f);
+
+                owner->halfBlackBeltSprite_->GetSpriteTransform()->SetColorA(alpha);
+                owner->completeWordSprite_->GetSpriteTransform()->SetColorA(alpha);
+
+                easingTimer_ += elapsedTime;
+            }
+            // フェードイン完了
+            else
+            {   
+                // 入力待ち
+                if ((gamePad.GetButtonDown() & GamePad::BTN_A) ||
+                    (mouse.GetButtonDown() & Mouse::BTN_LEFT))
+                {
+                    owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::SlideUiFadeOut));
+                    return;
+                }
+
+                owner->halfBlackBeltSprite_->GetSpriteTransform()->SetColorA(1.0f);
+                owner->completeWordSprite_->GetSpriteTransform()->SetColorA(1.0f);
+            }
+        }
+
+
     }
 
     // 終了化
@@ -534,58 +670,112 @@ namespace SceneLoadGameState
     // 初期化
     void LoadTitleState::Initialize()
     {
+        // 現在のステートを設定
+        owner->SetCurrentState(SceneLoadGame::STATE::LoadTitle);
+
         // 変数初期化
+        slideTimer_ = 0.0f;
         easingTimer_ = 0.0f;
+        isFadeOut_ = false;
     }
 
     // 更新
     void LoadTitleState::Update(const float& elapsedTime)
     {
-        float maxTime = 0.5f;
+        float maxSlideTime = 0.2f;
         float beforePosX = 125.0f;
         float afterPosX = -1000.0f;
-
-        if (easingTimer_ <= maxTime)
+        
+        if (!isFadeOut_)
         {
-            float spritePosX = Easing::InSine(easingTimer_, maxTime, afterPosX, beforePosX);
-
-            for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+            if (slideTimer_ <= maxSlideTime)
             {
-                owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
-                owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                float spritePosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX, beforePosX);
+
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                }
+
+                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(spritePosX);
+
+                float bookSpritePosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX - beforePosX, beforePosX - beforePosX);
+                owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+
+                float pointPosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX - 20.0f, beforePosX - 20.0f);
+                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+
+                slideTimer_ += elapsedTime;
             }
+            else
+            {
+                // Spriteを指定の位置に設定
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
+                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
+                }
+                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(afterPosX);
 
-            owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(spritePosX);
+                owner->bookSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
+                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
 
-            float bookSpritePosX = Easing::InSine(easingTimer_, maxTime, afterPosX - beforePosX, beforePosX - beforePosX);
-            owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(afterPosX - 20.0f);
+                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(afterPosX - 20.0f);
 
-            // フェードアウト
-            float alpha = Easing::InSine(easingTimer_, maxTime, 1.0f, 0.0f);
-            owner->whiteSprite_->GetSpriteTransform()->SetColorA(alpha);
-
-            easingTimer_ += elapsedTime;
+                isFadeOut_ = true;
+            }
         }
-        else
+
+        // フェードアウト
+        if (isFadeOut_)
         {
-            // Spriteを指定の位置に設定
-            for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+            float maxTime = 0.2f;
+            if (easingTimer_ <= maxTime)
             {
-                owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
-                owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
+                float alpha = Easing::InSine(easingTimer_, maxTime, 1.0f, 0.0f);
+                owner->whiteSprite_->GetSpriteTransform()->SetColorA(alpha);
+
+                easingTimer_ += elapsedTime;
             }
-            owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(afterPosX);
+            else
+            {
+                owner->whiteSprite_->GetSpriteTransform()->SetColorA(1.0f);
 
-            owner->bookSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
-
-            // シーン切り替え
-            SceneManager::Instance().ChangeScene(new SceneLoadingBack(new SceneTitle(new SceneLoadGame)));
-            return;
+                // シーン切り替え
+                SceneManager::Instance().ChangeScene(new SceneLoadingBack(new SceneTitle(new SceneLoadGame)));
+                return;
+            }
         }
     }
 
     // 終了化
     void LoadTitleState::Finalize()
+    {
+    }
+}
+
+// ChangeSceneState
+namespace SceneLoadGameState
+{
+    // 初期化
+    void ChangeSceneState::Initialize()
+    {
+        // 現在のステートを設定
+        owner->SetCurrentState(SceneLoadGame::STATE::ChangeScene);
+    }
+
+    // 更新
+    void ChangeSceneState::Update(const float& elapsedTime)
+    {
+        owner->ChangeScene();
+    }
+
+    // 終了化
+    void ChangeSceneState::Finalize()
     {
     }
 }

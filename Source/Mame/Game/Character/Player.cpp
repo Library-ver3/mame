@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "PlayerState.h"
 
 #include "../../Graphics/Graphics.h"
 
@@ -22,7 +23,24 @@ Player::~Player()
 // 初期化
 void Player::Initialize()
 {
+    // ----- アニメーション設定 -----
     Character::PlayAnimation(0, true);
+
+    // ----- ステートマシン -----
+#pragma region ステートマシン
+    stateMachine_ = std::make_unique<StateMachine<State<Player>>>();
+
+    // --- ステート登録 ---
+    GetStateMachine()->RegisterState(new PlayerState::IdleState(this));
+    GetStateMachine()->RegisterState(new PlayerState::WalkState(this));
+    GetStateMachine()->RegisterState(new PlayerState::JumpState(this));
+
+    // --- 最初のステートをセット ---
+    GetStateMachine()->SetState(static_cast<UINT>(STATE::Idle));
+#pragma endregion// ステートマシン
+
+
+
 }
 
 // 終了化
@@ -33,6 +51,10 @@ void Player::Finalize()
 // 更新
 void Player::Update(const float& elapsedTime)
 {
+    // ----- ステートマシン -----
+    GetStateMachine()->Update(elapsedTime);
+
+
 }
 
 // 描画
@@ -69,6 +91,11 @@ void Player::ConvertToCameraMoveVec(float ax, float ay)
         
 
     }
+}
+
+void Player::MoveUpdate(const float& elapsedTime)
+{
+    
 }
 
 // ステート切り替え

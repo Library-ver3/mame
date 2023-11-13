@@ -35,6 +35,9 @@ public:
         DirectX::XMFLOAT2 texPos_ = {};          // テクスチャ座標
         DirectX::XMFLOAT2 texSize_ = { 100,100 };// テクスチャサイズ
 
+        // ImGui用
+        bool isSizeFactor_ = false;
+
     public:
         // ImGui用
         void DrawDebug();
@@ -62,11 +65,27 @@ public:
         void AddPosY(const float& posY) { position_.y += posY; }
         
         // 引数の位置を画像の中心として、画像の位置を設定する
-        void SetSpriteCenterPos(DirectX::XMFLOAT2& pos)
+        void SetSpriteCenterPos(DirectX::XMFLOAT2 pos)
         {
             pos.x -= GetSizeX() / 2;
             pos.y -= GetSizeY() / 2;
             position_ = pos;
+        }
+        void SetSpriteCenterPos(float x, float y)
+        {
+            x -= GetSizeX() / 2;
+            y -= GetSizeY() / 2;
+            position_ = { x, y };
+        }
+        // 引数の位置を画像の左上としたときの、画像の位置を設定する
+        // ※通常の設定の感覚で使いたい場合こっちを使うことをお勧めする
+        void SetSpriteCenterPos(float x, float y, float size)
+        {
+            x += size / 2;
+            y += size / 2;
+            x -= GetSizeX() / 2;
+            y -= GetSizeY() / 2;
+            position_ = { x, y };
         }
         
         // ----- 大きさ -----

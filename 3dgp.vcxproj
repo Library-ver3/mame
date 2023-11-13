@@ -310,6 +310,7 @@
     <ClInclude Include="Source\Mame\Resource\sprite.h" />
     <ClInclude Include="Source\Mame\Resource\texture.h" />
     <ClInclude Include="Source\Mame\Scene\BaseScene.h" />
+    <ClInclude Include="Source\Mame\Scene\SceneDummy.h" />
     <ClInclude Include="Source\Mame\Scene\LoadingPlayer.h" />
     <ClInclude Include="Source\Mame\Scene\SceneGame.h" />
     <ClInclude Include="Source\Mame\Scene\SceneLoadGame.h" />

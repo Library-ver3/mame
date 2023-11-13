@@ -554,6 +554,9 @@
     <ClInclude Include="Source\Mame\Game\Character\PlayerState.h">
       <Filter>Mame\Game\Character\Player</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Mame\Scene\SceneDummy.h">
+      <Filter>Mame\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\Shader\static_mesh.hlsli">
