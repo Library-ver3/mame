@@ -10,6 +10,8 @@
 
 #include "NoiseTexture.h"
 
+#include "../Other/Easing.h"
+
 //---ImGui–¼‘O‚©‚Ô‚è–h~—p---//
 int Sprite::nameNum = 0;
 //---ImGui–¼‘O‚©‚Ô‚è–h~—p---//
@@ -384,6 +386,40 @@ void Sprite::DrawDebug()
 
         ImGui::EndMenu();
     }
+}
+
+// U“®
+void Sprite::Vibration(const float& elapsedTime, const float& volume, const float& breakTime)
+{
+    if (volume <= 0) return; // U“®’l‚ª‚È‚¢ê‡‚Íˆ—‚µ‚È‚¢
+    
+    // U“®‚ÌŠÔ‚ÌŠÔ‚ğ‹ó‚¯‚é‚½‚ß‚Ìˆ—
+    if (vibrationBreakTimer_ >= 0.0f)
+    {   // breakTime‚ªc‚Á‚Ä‚¢‚é‚Æ‚«‚Íˆ—‚µ‚È‚¢
+        vibrationBreakTimer_ -= elapsedTime;
+        return;
+    }
+
+    // breakTime‚ğİ’è
+    vibrationBreakTimer_ = breakTime;
+
+    // ‘O‰ñ‚ÌŒ‹‰Ê‚ğƒŠƒZƒbƒg‚·‚é
+    GetSpriteTransform()->SubtractPos(oldVibration_);
+
+    // U“®‚Ì•A•ûŒü‚ğZo‚·‚é
+    DirectX::XMFLOAT2 vibration = { (rand() % 100 - 50.0f), (rand() % 100 - 50.0f) };
+    DirectX::XMVECTOR Vibration = DirectX::XMVector2Normalize(DirectX::XMLoadFloat2(&vibration));
+
+    float vibrationVolume = volume * 1000 * elapsedTime;
+
+    Vibration = DirectX::XMVectorScale(Vibration, vibrationVolume);
+    DirectX::XMStoreFloat2(&vibration, Vibration);
+
+    // U“®‚Ì’l‚ğ“ü‚ê‚éB
+    GetSpriteTransform()->AddPos(vibration);
+
+    // Œ»İ‚ÌU“®’l‚ğ•Û‘¶‚µ‚Ä‚¨‚­
+    oldVibration_ = vibration;
 }
 
 // SpriteTransform

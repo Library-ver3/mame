@@ -24,7 +24,8 @@ public:
     Sprite(ID3D11Device* device, const wchar_t* filename);
     ~Sprite();
 
-public:
+private:// Transform 関連 ( 構造体 )
+#pragma region [各種Transform] struct
     struct SpriteTransform
     {
     private:
@@ -43,10 +44,13 @@ public:
         void DrawDebug();
 
         // ----- 位置 -----
+#pragma region 位置 ( position )
+        // --- Get ---
         DirectX::XMFLOAT2 GetPos() { return position_; }
         float GetPosX() { return position_.x; }
         float GetPosY() { return position_.y; }
 
+        // --- Set ---
         void SetPos(const DirectX::XMFLOAT2& pos) { position_ = pos; }
         void SetPos(const float& x, const float& y) 
         {
@@ -56,14 +60,35 @@ public:
         void SetPosX(const float& posX) { position_.x = posX; }
         void SetPosY(const float& posY) { position_.y = posY; }
 
+        // --- Add ---
         void AddPos(const DirectX::XMFLOAT2& pos)
         {
             position_.x += pos.x;
             position_.y += pos.y;
         }
+        void AddPos(const float& posX, const float& posY)
+        {
+            position_.x += posX;
+            position_.y += posY;
+        }
         void AddPosX(const float& posX) { position_.x += posX; }
         void AddPosY(const float& posY) { position_.y += posY; }
         
+        // --- Subtract ---
+        void SubtractPos(const DirectX::XMFLOAT2& pos)
+        {
+            position_.x -= pos.x;
+            position_.y -= pos.y;
+        }
+        void SubtractPos(const float& posX, const float& posY)
+        {
+            position_.x -= posX;
+            position_.y -= posY;
+        }
+        void SubtractPosX(const float& posX) { position_.x -= posX; }
+        void SubtractPosY(const float& posY) { position_.y -= posY; }
+
+
         // 引数の位置を画像の中心として、画像の位置を設定する
         void SetSpriteCenterPos(DirectX::XMFLOAT2 pos)
         {
@@ -77,6 +102,7 @@ public:
             y -= GetSizeY() / 2;
             position_ = { x, y };
         }
+
         // 引数の位置を画像の左上としたときの、画像の位置を設定する
         // ※通常の設定の感覚で使いたい場合こっちを使うことをお勧めする
         void SetSpriteCenterPos(float x, float y, float size)
@@ -88,11 +114,16 @@ public:
             position_ = { x, y };
         }
         
+#pragma endregion// 位置 ( position )
+
         // ----- 大きさ -----
+#pragma region 大きさ ( size )
+        // --- Get ---
         DirectX::XMFLOAT2 GetSize() { return size_; }
         float GetSizeX() { return size_.x; }
         float GetSizeY() { return size_.y; }
 
+        // --- Set ---
         void SetSize(const DirectX::XMFLOAT2& size) { size_ = size; }
         void SetSize(const float& x, const float& y)
         {
@@ -103,13 +134,18 @@ public:
         void SetSizeY(const float& sizeY) { size_.y = sizeY; }
         void SetSize(const float& size) { size_ = { size,size }; }
 
+#pragma endregion// 大きさ ( size )
+
         // ----- 色 -----
+#pragma region 色 ( color )
+        // --- Get ---
         DirectX::XMFLOAT4 GetColor() { return color_; }
         float GetColorR() { return color_.x; }
         float GetColorG() { return color_.y; }
         float GetColorB() { return color_.z; }
         float GetColorA() { return color_.w; }
 
+        // --- Set ---
         void SetColor(const DirectX::XMFLOAT4& color) { color_ = color; }
         void SetColor(const float& r, const float& g, const float& b, const float& a)
         {
@@ -131,18 +167,29 @@ public:
         void SetColorWhite() { color_ = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, color_.w); }
         void SetColorBlack() { color_ = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, color_.w); }
 
+#pragma endregion// 色 ( color )
+
         // ----- 角度 -----
+#pragma region 角度 ( angle )
+        // --- Get ---
         float GetAngle() { return angle_; }
 
+        // --- Set ---
         void SetAngle(const float& angle) { angle_ = angle; }
 
+        // --- Add ---
         void AddAngle(const float& angle) { angle_ += angle; }
 
+#pragma endregion// 角度 ( angle )
+
         // ----- テクスチャ座標 -----
+#pragma region テクスチャ座標 ( texPos )
+        // --- Get ---
         DirectX::XMFLOAT2 GetTexPos() { return texPos_; }
         float GetTexPosX() { return texPos_.x; }
         float GetTexPosY() { return texPos_.y; }
 
+        // --- Set ---
         void SetTexPos(const DirectX::XMFLOAT2& texPos) { texPos_ = texPos; }
         void SetTexPos(const float& texPosX, const float& texPosY)
         {
@@ -151,12 +198,16 @@ public:
         }
         void SetTexPosX(const float& texPosX) { texPos_.x = texPosX; }
         void SetTexPosY(const float& texPosY) { texPos_.y = texPosY; }
+#pragma endregion// テクスチャ座標 ( texPos )
 
         // ----- テクスチャサイズ -----
+#pragma region テクスチャサイズ ( texSize )
+        // --- Get ---
         DirectX::XMFLOAT2 GetTexSize() { return texSize_; }
         float GetTexSizeX() { return texSize_.x; }
         float GetTexSizeY() { return texSize_.y; }
 
+        // --- Set ---
         void SetTexSize(const DirectX::XMFLOAT2& texSize) { texSize_ = texSize; }
         void SetTexSize(const float& texSizeX, const float& texSizeY)
         {
@@ -165,6 +216,8 @@ public:
         }
         void SetTexSizeX(const float& texSizeX) { texSize_.x = texSizeX; }
         void SetTexSizeY(const float& texSizeY) { texSize_.y = texSizeY; }
+
+#pragma endregion// テクスチャサイズ ( texSize )
     };
 
     // ここは改良の余地あり
@@ -219,67 +272,65 @@ public:
         void SetEmissiveIntensity(float intensity) { emissiveIntensity_ = intensity; }
         float GetEmissiveIntensity() { return emissiveIntensity_; }
     };
+
+#pragma endregion// [各種Transform] struct
+
 public:    
     void Initialize();
-
     void Update(const float& elapsedTime);
+    void Render(ID3D11PixelShader* psShader = nullptr, const char* type = "");
+    void DrawDebug();
 
-    void UpdateSpriteDissolve(const float& elapsedTime);
-    bool FadeIn(const float& elapsedTime);
-    bool FadeOut(const float& elapsedTime);
+    void SetConstantBuffer(const char* type);
 
-    /// <summary>
-    /// アニメーション更新関数
-    /// </summary>
-    /// <param name="elapsedTime">フレーム経過時間</param>
-    /// <param name="frameSpeed">アニメーションする速さ</param>
-    /// <param name="totalAnimationFrame">アニメーションフレーム数</param>
-    /// <param name="animationVertical">縦アニメーションの場合true</param>
+    // ---------- Animation ----------
+#pragma region [Animation] Function
+    // --- 更新 ---
     bool PlayAnimation(
-        const float elapsedTime,
-        const float frameSpeed,
-        const float totalAnimationFrame,
-        const bool animationVertical = false,
-        const bool loop = false
+        const float elapsedTime,                // 経過時間
+        const float frameSpeed,                 // アニメーション速度
+        const float totalAnimationFrame,        // アニメーションフレーム数
+        const bool animationVertical = false,   // 縦アニメーションの場合true
+        const bool loop = false                 // ループするか
     );
-
+    
+    // --- リセット ---
     void ResetAnimation()
     {
         spriteTransform_.SetTexPos(DirectX::XMFLOAT2(0, 0));
         animationTime_ = 0.0f;
         animationFrame_ = 0.0f;
     }
+#pragma endregion// [Animation] Function
 
-    //ワールド座標からスクリーン座標に変更後描画
+    // ---------- Dissolve ----------
+#pragma region [Dissolve] Function
+    void UpdateSpriteDissolve(const float& elapsedTime);
+    bool FadeIn(const float& elapsedTime);
+    bool FadeOut(const float& elapsedTime);
+#pragma endregion// [Dissolve] Function
+
+    // --- ワールド座標からスクリーン座標に変更後描画 ---
     static DirectX::XMFLOAT2 ConvertToScreenPos(const DirectX::XMFLOAT3 worldPos, bool* isDraw = nullptr); // isDraw：描画するか
 
-    void Render(ID3D11PixelShader* psShader = nullptr, const char* type = "");
+    // --- 振動 ---
+    void Vibration(const float& elapsedTime, const float& volume, const float& breakTime);
 
-    void SetConstantBuffer(const char* type);
-
-    void DrawDebug();
-
+public:// 取得・設定
+#pragma region [Get, Set] Function
+    // --- Transform ---
     SpriteTransform* GetSpriteTransform() { return &spriteTransform_; }
     SpriteDissolve* GetSpriteDissolve() { return &spriteDissolve_; }
     Emissive* GetEmissive() { return &emissive_; }
 
+    // --- Dissolve ---
     void SetIsFade(bool fade) { isFade_ = fade; }
     bool GetIsFade() { return isFade_; }
 
+#pragma endregion// [Get, Set] Function
+
 private:// 内部処理だけで完結する関数
     void Render(ID3D11DeviceContext* deviceContext, ID3D11PixelShader* psShader);
-
-private:// 変数等々
-    SpriteTransform spriteTransform_;   // Transform
-    SpriteDissolve spriteDissolve_;     // Dissolve
-    Emissive emissive_;                 // Emissive
-
-    // Animation
-    float animationTime_ = 0.0f;
-    float animationFrame_ = 0.0f;
-
-    // Dissolve
-    bool isFade_ = false;
 
 public:// SkyBox等で使うためpublic
     struct Vertex
@@ -291,26 +342,43 @@ public:// SkyBox等で使うためpublic
     Microsoft::WRL::ComPtr<ID3D11Buffer> GetVertexBuffer() { return vertexBuffer; }
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetShaderResourceView() { return shaderResourceView; }
 
-private:// shader関連
+private:// メンバ変数
+    // ---------- Transform ----------
+    SpriteTransform spriteTransform_;   // Transform
+    SpriteDissolve spriteDissolve_;     // Dissolve
+    Emissive emissive_;                 // Emissive
+
+    // ---------- Animation ----------
+    float animationTime_ = 0.0f;
+    float animationFrame_ = 0.0f;
+
+    // ---------- Dissolve ----------
+    bool isFade_ = false;
+
+    // ---------- 振動 ----------
+    DirectX::XMFLOAT2 oldVibration_ = {};
+    float vibrationBreakTimer_ = 0.0f;
+
+    // ---------- シェーダー ----------
     Microsoft::WRL::ComPtr<ID3D11VertexShader> vertexShader;
     Microsoft::WRL::ComPtr<ID3D11PixelShader> pixelShader;
     Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
     Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
     D3D11_TEXTURE2D_DESC texture2dDesc;
-        
-    // dissolve
+
+    // --- Dissolve ---
     struct DissolveConstants
     {
         DirectX::XMFLOAT4 parameters = {};  // x: ディゾルブ適応量
-                                            // y: 黒色
-                                            // z: 縁の閾値
-                                            // w: 空き
+        // y: 黒色
+        // z: 縁の閾値
+        // w: 空き
         DirectX::XMFLOAT4 edgeColor = {};   // 縁の色
     };
     Microsoft::WRL::ComPtr<ID3D11Buffer> dissolveConstantBuffer = nullptr;
 
-
+#pragma region ImGui
 public:// ----- ImGui用 ----- //
     static int nameNum;
     const char* GetName() { return name_.c_str(); }
@@ -318,4 +386,5 @@ public:// ----- ImGui用 ----- //
 
 private:// ----- ImGui用 ----- //
     std::string name_;
+#pragma endregion// ImGui
 };

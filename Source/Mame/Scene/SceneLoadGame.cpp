@@ -71,6 +71,13 @@ void SceneLoadGame::CreateResource()
             L"./Resources/Image/UI/waku.png");
         pointRhombusSprite_ = std::make_unique<Sprite>(graphics.GetDevice(),
             L"./Resources/Image/UI/rhombus.png");
+
+        gameDataNumSprite_[0] = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/LoadGame/arrow.png");
+        gameDataNumSprite_[1] = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/LoadGame/arrow.png");
+        gameDataNumSprite_[2] = std::make_unique<Sprite>(graphics.GetDevice(),
+            L"./Resources/Image/LoadGame/arrow.png");
     }
 
     // ステートマシン
@@ -189,7 +196,7 @@ void SceneLoadGame::Update(const float& elapsedTime)
         // ここでは処理書かない
     }
 
-
+    gameDataNumSprite_[0]->Vibration(elapsedTime, volume, breakTime);
 }
 
 // 描画
@@ -249,15 +256,23 @@ void SceneLoadGame::Render()
         pointRhombusSprite_->Render();
 
         // ※描画順に注意
-        // base -> chose -> word
+        // base -> chose -> num -> word
         {
             // base
             for (int i = 0; i < static_cast<UINT>(GameDataBase::Max); ++i)
             {
                 gameDataBaseSprite_[i]->Render();
             }
+
             // chose
             gameDataChoseSprite_->Render(spriteDissolvePS_.Get(), "Dissolve");
+            
+            // num
+            for (int i = 0; i < static_cast<UINT>(GameDataBase::Max); ++i)
+            {
+                gameDataNumSprite_[i]->Render();
+            }
+
             // word
             for (int i = 0; i < static_cast<UINT>(GameDataBase::Max); ++i)
             {
@@ -305,6 +320,14 @@ void SceneLoadGame::DrawDebug()
     Mouse& mouse = Input::Instance().GetMouse();
     DirectX::XMFLOAT2 mousePos = { static_cast<float>(mouse.GetPositionX()), static_cast<float>(mouse.GetPositionY()) };
     ImGui::InputFloat2("mouse", &mousePos.x);
+
+    ImGui::DragFloat("volume", &volume);
+    ImGui::DragFloat("breakTime", &breakTime);
+
+    for (int i = 0; i < static_cast<UINT>(GameDataBase::Max); ++i)
+    {
+        gameDataNumSprite_[i]->DrawDebug();
+    }
 
     choseLoadDataWordSprite_->DrawDebug();
     pointWakuSprite_->DrawDebug();

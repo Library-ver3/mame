@@ -53,6 +53,9 @@ public:// 基本的な関数
 
     void ChangeScene();
 
+    float volume = 3.0f;
+    float breakTime = 1.0f;
+
 private:
     void UpdatePointRhombusSprite(const float& elapsedTime);
 
@@ -85,6 +88,8 @@ public:// ステートマシンで触るために public
     std::unique_ptr<Sprite> choseLoadDataWordSprite_;
     std::unique_ptr<Sprite> pointWakuSprite_;
     std::unique_ptr<Sprite> pointRhombusSprite_;
+
+    std::unique_ptr<Sprite> gameDataNumSprite_[static_cast<UINT>(GameDataBase::Max)];
 
 private:
     std::unique_ptr<ConstantBuffer<Shader::SceneConstants>> sceneConstants_;
