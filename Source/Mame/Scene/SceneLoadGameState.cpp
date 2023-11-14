@@ -28,46 +28,93 @@ namespace SceneLoadGameState
     void SlideUiState::Update(const float& elapsedTime)
     {
         float maxTime = 0.4f;
-        float startGameDataBase = -1100.0f;
-        float endGameDataBase = 125.0f;
+
+        float startAddPosX = -1225.0f;
+        float endAddPosX = 0.0f;
+
         if (easingTimer_ <= maxTime)
         {
-            float gameDataBasePosX = Easing::InSine(easingTimer_, maxTime, endGameDataBase, startGameDataBase);
-
-            for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+            // 125 ~ 1225 - 125
             {
-                owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(gameDataBasePosX);
-                owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(gameDataBasePosX);
+                // ゲームデータの外枠と選択用画像
+                float finalGameDataBasePosX = 125.0f;
+                float gameDataBasePosX = Easing::InSine(easingTimer_, maxTime, endAddPosX - finalGameDataBasePosX, startAddPosX - finalGameDataBasePosX);
+
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(gameDataBasePosX);
+                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(gameDataBasePosX);
+                }
+
+                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(gameDataBasePosX);
             }
 
-            owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(gameDataBasePosX);
+            // -1225 ~ 0
+            {
+                float bookSpritePosX = Easing::InSine(easingTimer_, maxTime, endAddPosX, startAddPosX);
+                
+                // 背景の本の画像
+                owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+                
+                // 文字
+                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+            }
 
-            float bookSpritePosX = Easing::InSine(easingTimer_, maxTime, endGameDataBase - endGameDataBase, startGameDataBase - endGameDataBase);
-            owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
-            owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+            // 105 ~ 1255 - 145
+            {
+                float finalPointPosX = 105.0f;
+                float pointPosX = Easing::InSine(easingTimer_, maxTime, endAddPosX - finalPointPosX, startAddPosX - finalPointPosX);
+                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+            }
 
-            float pointPosX = Easing::InSine(easingTimer_, maxTime, endGameDataBase - 20.0f, startGameDataBase - 20.0f);
-            owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(pointPosX);
-            owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(pointPosX);
-
+            // [01,02,03 文字]
+            {
+                float finalNumPosX[3] = { 260.0f, 290.0f, 245.0f };
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    float numPosX = Easing::InSine(easingTimer_, maxTime, endAddPosX + finalNumPosX[i], startAddPosX + finalNumPosX[i]);
+                    owner->gameDataNumSprite_[i]->GetSpriteTransform()->SetPosX(numPosX);
+                }                
+            }
 
             easingTimer_ += elapsedTime;
         }
         else
         {
-            for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+            // 125
             {
-                owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(endGameDataBase);
-                owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(endGameDataBase);
+                float finalGameDataBasePosX = 125.0f;
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(finalGameDataBasePosX);
+                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(finalGameDataBasePosX);
+                }
+                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(finalGameDataBasePosX);
             }
 
-            owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(endGameDataBase);
+            // 0
+            {
+                float finalPosX = 0.0f;
+                owner->bookSprite_->GetSpriteTransform()->SetPosX(finalPosX);
+                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(finalPosX);
+            }
 
-            owner->bookSprite_->GetSpriteTransform()->SetPosX(endGameDataBase - endGameDataBase);
-            owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(endGameDataBase - endGameDataBase);
+            // 105
+            {
+                float finalPointPosX = 105.0f;
+                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(finalPointPosX);
+                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(finalPointPosX);
+            }
 
-            owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(endGameDataBase - 20.0f);
-            owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(endGameDataBase - 20.0f);
+            // [01,02,03 文字]
+            {
+                float finalNumPosX[3] = { 260.0f, 290.0f, 245.0f };
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataNumSprite_[i]->GetSpriteTransform()->SetPosX(endAddPosX + finalNumPosX[i]);
+                }
+            }
 
             owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::Select));
             return;
@@ -103,9 +150,11 @@ namespace SceneLoadGameState
     void SelectState::Update(const float& elapsedTime)
     {
         GamePad& gamePad = Input::Instance().GetGamePad();
+        Mouse& mouse = Input::Instance().GetMouse();
 
         // タイトルに戻る
-        if (gamePad.GetButtonDown() & GamePad::BTN_B)
+        if ((gamePad.GetButtonDown() & GamePad::BTN_B)
+            || mouse.GetButtonDown() & Mouse::BTN_RIGHT)
         {
             owner->loadingScene_ = (new SceneLoading(new SceneDummy));
             owner->thread_ = new std::thread(owner->LoadingThread, owner);
@@ -264,7 +313,8 @@ namespace SceneLoadGameState
         // 変数初期化
         isChose_ = false;
         
-        currentState_ = 0;
+        currentState_ = STATE::Yes;
+        oldCurrentState_ = STATE::Yes;
         easingTimer_ = 0.0f;
         animationTimer_ = 0.0f;
     }
@@ -288,7 +338,7 @@ namespace SceneLoadGameState
                 owner->choseSprite_->PlayAnimation(elapsedTime, 15.0f, 3, false);
             }
 
-            // ボタン押されるのまってる。
+            // ボタン押されるのまってる。( はい、いいえ )
             PushButton();
         }
 
@@ -332,40 +382,63 @@ namespace SceneLoadGameState
         GamePad& gamePad = Input::Instance().GetGamePad();
         float aLx = gamePad.GetAxisLX();
 
-        if (currentState_ == static_cast<UINT>(STATE::Yes))
+        Mouse& mouse = Input::Instance().GetMouse();
+        DirectX::XMFLOAT2 mousePos = { static_cast<float>(mouse.GetPositionX()), static_cast<float>(mouse.GetPositionY()) };
+
+        oldCurrentState_ = currentState_;
+
+#pragma region マウスによる選択
+        // ---------- マウスのカーソルの位置によってステートを変更 ----------
+
+        // --- はい を選択 ---
+        if (currentState_ == STATE::Yes)
+        {   
+            // 右クリックしたら No に飛ばす
+            if (mouse.GetButtonDown() & Mouse::BTN_RIGHT)
+            {
+                ChangeCurrentState(STATE::No);
+            }
+        }
+        if ((mousePos.x > mousePos_[0].left_) && (mousePos.x < mousePos_[0].right_) && (mousePos.y > mousePos_[0].top_) && (mousePos.y < mousePos_[0].bottom_))
         {
+            ChangeCurrentState(STATE::Yes);
+        }
+
+        // --- いいえ を選択 ---
+        if ((mousePos.x > mousePos_[1].left_) && (mousePos.x < mousePos_[1].right_) && (mousePos.y > mousePos_[1].top_) && (mousePos.y < mousePos_[1].bottom_))
+        {
+            ChangeCurrentState(STATE::No);
+        }
+
+#pragma endregion// マウスによる選択
+
+#pragma region ゲームパッドによる選択 (keyboard)
+        // ---------- 入力によるステート変更 ----------
+
+        if (currentState_ == STATE::Yes)
+        {   // [はい] にカーソルがある
+            // --- Bボタンを押したら [いいえ] に飛ばす
             if (gamePad.GetButtonDown() & GamePad::BTN_B)
             {
-                easingTimer_ = 0.0f;
-                owner->choseSprite_->ResetAnimation();
-                owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
-
-                currentState_ = static_cast<UINT>(STATE::No);
-                return;
+                ChangeCurrentState(STATE::No);
             }
 
+            // --- スティックの傾きによるステート変更 ---
             if (aLx > 0.8f)
-            {   // スティックを右に傾けた。
-                easingTimer_ = 0.0f;
-                owner->choseSprite_->ResetAnimation();
-                owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
-
-                currentState_ = static_cast<UINT>(STATE::No);
-                return;
+            {
+                ChangeCurrentState(STATE::No);
             }
         }
-        else
-        {
+
+        if(currentState_ == STATE::No)
+        {   // [いいえ] にカーソルがある
+            // --- スティックの傾きによるステート変更 ---
             if (aLx < -0.8f)
-            {   // スティックを左に傾けた。
-                easingTimer_ = 0.0f;
-                owner->choseSprite_->ResetAnimation();
-                owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
-
-                currentState_ = static_cast<UINT>(STATE::Yes);
-                return;
+            {
+                ChangeCurrentState(STATE::Yes);
             }
         }
+#pragma endregion// ゲームパッドによる選択 (keyboard)
     }
 
     // 選択カーソルの更新
@@ -377,7 +450,7 @@ namespace SceneLoadGameState
             float scale = Easing::InSine(easingTimer_, maxTime, 100.0f, 0.0f);
 
             // 位置設定
-            if (currentState_ == static_cast<UINT>(STATE::Yes))
+            if (currentState_ == STATE::Yes)
                 owner->choseSprite_->GetSpriteTransform()->SetSpriteCenterPos(DirectX::XMFLOAT2(500, 425));
             else
                 owner->choseSprite_->GetSpriteTransform()->SetSpriteCenterPos(DirectX::XMFLOAT2(675, 425));
@@ -403,7 +476,48 @@ namespace SceneLoadGameState
     void LoadGameChoseState::PushButton()
     {
         GamePad& gamePad = Input::Instance().GetGamePad();
-        if (currentState_ == static_cast<UINT>(STATE::Yes))
+
+        Mouse& mouse = Input::Instance().GetMouse();
+        DirectX::XMFLOAT2 mousePos = { static_cast<float>(mouse.GetPositionX()), static_cast<float>(mouse.GetPositionY()) };
+
+#pragma region マウスによる選択
+        // ---------- マウスクリックによる選択 ----------
+
+        // --- はい を選択 ---
+        if (((mousePos.x > mousePos_[0].left_) && (mousePos.x < mousePos_[0].right_) && (mousePos.y > mousePos_[0].top_) && (mousePos.y < mousePos_[0].bottom_))
+            && (mouse.GetButtonDown() & Mouse::BTN_LEFT))
+        {   // ゲームを読み込む                
+            // 最終確認用Spriteを消す
+            owner->blackBeltSprite_->GetSpriteTransform()->SetColorA(0.0f);
+            owner->loadGameWordSprite_->GetSpriteTransform()->SetColorA(0.0f);
+            owner->choseSprite_->GetSpriteTransform()->SetColorA(0.0f);
+
+            // 次のステートへ
+            owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::LoadGame));
+            return;
+        }
+
+        // --- いいえ を選択 ---
+        if (((mousePos.x > mousePos_[1].left_) && (mousePos.x < mousePos_[1].right_) && (mousePos.y > mousePos_[1].top_) && (mousePos.y < mousePos_[1].bottom_))
+            && (mouse.GetButtonDown() & Mouse::BTN_LEFT))
+        {   // selectに戻る
+            // 最終確認用Spriteを消す
+            owner->blackBeltSprite_->GetSpriteTransform()->SetColorA(0.0f);
+            owner->loadGameWordSprite_->GetSpriteTransform()->SetColorA(0.0f);
+            owner->choseSprite_->GetSpriteTransform()->SetColorA(0.0f);
+
+            // 次のステートへ
+            owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::Select));
+            return;
+        }
+
+#pragma endregion// マウスによる選択
+
+#pragma region ゲームパッドによる選択 (keyboard)
+        // ---------- ボタン入力による選択 ----------
+
+        // --- はい を選択 ---
+        if (currentState_ == STATE::Yes)
         {   // ゲームを読み込む
             if (gamePad.GetButtonDown() & GamePad::BTN_A)
             {
@@ -415,27 +529,12 @@ namespace SceneLoadGameState
                 // 次のステートへ
                 owner->GetStateMachine()->ChangeState(static_cast<UINT>(SceneLoadGame::STATE::LoadGame));
                 return;
-
-#if 0
-                // どのゲームデータに飛ぶか
-                switch (owner->GetSelectState())
-                {
-                case static_cast<UINT>(SceneLoadGame::GameDataBase::Top):
-                    // 一つ目のデータ
-
-                    break;
-                case static_cast<UINT>(SceneLoadGame::GameDataBase::Middle):
-                    // 二つ目のデータ
-                    break;
-                case static_cast<UINT>(SceneLoadGame::GameDataBase::Bottom):
-                    // 三つ目のデータ
-                    break;
-                }
-#endif
             }
         }
-        else
-        {   // 戻る
+
+        // --- いいえ を選択 ---]
+        if (currentState_ == STATE::No)
+        {
             if (gamePad.GetButtonDown() & GamePad::BTN_A)
             {
                 // 最終確認用Spriteを消す
@@ -448,6 +547,20 @@ namespace SceneLoadGameState
                 return;
             }
         }
+
+#pragma endregion// ゲームパッドによる選択 (keyboard)
+    }
+
+    // ステート変更
+    void LoadGameChoseState::ChangeCurrentState(STATE state)
+    {
+        // 今選択しているものと、新しく選択したものが同じなら処理しない
+        currentState_ = state;
+        if (currentState_ == oldCurrentState_) return;
+
+        easingTimer_ = 0.0f;
+        owner->choseSprite_->ResetAnimation();
+        owner->choseSprite_->GetSpriteTransform()->SetSize(0.0f);
     }
 }
 
@@ -471,48 +584,91 @@ namespace SceneLoadGameState
     {
 #pragma region 画像を移動させる
         float maxSlideTime = 0.2f;
-        float beforePosX = 125.0f;
-        float afterPosX = -1100.0f;
+
+        float endAddPosX = -1225.0f;
+        float startAddPosX = 0.0f;
         
         if (!isFadeOut_)
         {
             if (slideTimer_ <= maxSlideTime)
             {
-                float spritePosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX, beforePosX);
-
-                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                // 125 ~ 1225 - 125
                 {
-                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
-                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                    // ゲームデータの外枠と選択用画像
+                    float finalGameDataBasePosX = 125.0f;
+                    float spritePosX = Easing::InSine(slideTimer_, maxSlideTime, endAddPosX - finalGameDataBasePosX, startAddPosX - finalGameDataBasePosX);
+
+                    for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                    {
+                        owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                        owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(spritePosX);
+                    }
+
+                    owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(spritePosX);
                 }
 
-                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(spritePosX);
+                // -1225 ~ 0
+                {
+                    float bookSpritePosX = Easing::InSine(slideTimer_, maxSlideTime, endAddPosX, startAddPosX);
+                    owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+                    owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+                }
 
-                float bookSpritePosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX - beforePosX, beforePosX - beforePosX);
-                owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
-                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+                // 105 ~ 1255 - 145
+                {
+                    float finalPointPosX = 105.0f;
+                    float pointPosX = Easing::InSine(slideTimer_, maxSlideTime, endAddPosX - finalPointPosX, startAddPosX - finalPointPosX);
+                    owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+                    owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+                }
 
-                float pointPosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX - 20.0f, beforePosX - 20.0f);
-                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(pointPosX);
-                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(pointPosX);
+                // [01,02,03 文字]
+                {
+                    float finalNumPosX[3] = { 260.0f, 290.0f, 245.0f };
+                    for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                    {
+                        float numPosX = Easing::InSine(slideTimer_, maxSlideTime, endAddPosX + finalNumPosX[i], startAddPosX + finalNumPosX[i]);
+                        owner->gameDataNumSprite_[i]->GetSpriteTransform()->SetPosX(numPosX);
+                    }
+                }
 
                 slideTimer_ += elapsedTime;
             }
             else
             {
                 // Spriteを指定の位置に設定
-                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                // 125
                 {
-                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
-                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
+                    float finalGameDataBasePosX = 125.0f;
+                    for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                    {
+                        owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(endAddPosX - finalGameDataBasePosX);
+                        owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(endAddPosX - finalGameDataBasePosX);
+                    }
+                    owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(endAddPosX - finalGameDataBasePosX);
                 }
-                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(afterPosX);
 
-                owner->bookSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
-                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
+                // 0
+                {
+                    owner->bookSprite_->GetSpriteTransform()->SetPosX(endAddPosX);
+                    owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(endAddPosX);
+                }
 
-                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(afterPosX - 20.0f);
-                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(afterPosX - 20.0f);
+                // 105
+                {
+                    float finalPointPosX = 105.0f;
+                    owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(endAddPosX - finalPointPosX);
+                    owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(endAddPosX - finalPointPosX);
+                }
+
+                // [01,02,03 文字]
+                {
+                    float finalNumPosX[3] = { 260.0f, 290.0f, 245.0f };
+                    for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                    {
+                        owner->gameDataNumSprite_[i]->GetSpriteTransform()->SetPosX(endAddPosX + finalNumPosX[i]);
+                    }
+                }
 
                 isFadeOut_ = true;
             }
@@ -683,14 +839,17 @@ namespace SceneLoadGameState
     void LoadTitleState::Update(const float& elapsedTime)
     {
         float maxSlideTime = 0.2f;
-        float beforePosX = 125.0f;
-        float afterPosX = -1000.0f;
-        
-        if (!isFadeOut_)
+
+        float endAddPosX = -1225.0f;
+        float startAddPosX = 0.0f;
+
+        if (slideTimer_ <= maxSlideTime)
         {
-            if (slideTimer_ <= maxSlideTime)
+            // 125 ~ 1225 - 125
             {
-                float spritePosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX, beforePosX);
+                // ゲームデータの外枠と選択用画像
+                float finalGameDataBasePosX = 125.0f;
+                float spritePosX = Easing::InSine(slideTimer_, maxSlideTime, endAddPosX - finalGameDataBasePosX, startAddPosX - finalGameDataBasePosX);
 
                 for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
                 {
@@ -699,35 +858,73 @@ namespace SceneLoadGameState
                 }
 
                 owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(spritePosX);
+            }
 
-                float bookSpritePosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX - beforePosX, beforePosX - beforePosX);
+            // -1225 ~ 0
+            {
+                float bookSpritePosX = Easing::InSine(slideTimer_, maxSlideTime, endAddPosX, startAddPosX);
                 owner->bookSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
                 owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(bookSpritePosX);
+            }
 
-                float pointPosX = Easing::InSine(slideTimer_, maxSlideTime, afterPosX - 20.0f, beforePosX - 20.0f);
+            // 105 ~ 1255 - 145
+            {
+                float finalPointPosX = 105.0f;
+                float pointPosX = Easing::InSine(slideTimer_, maxSlideTime, endAddPosX - finalPointPosX, startAddPosX - finalPointPosX);
                 owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(pointPosX);
                 owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(pointPosX);
-
-                slideTimer_ += elapsedTime;
             }
-            else
+
+            // [01,02,03 文字]
             {
-                // Spriteを指定の位置に設定
+                float finalNumPosX[3] = { 260.0f, 290.0f, 245.0f };
                 for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
                 {
-                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
-                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(afterPosX);
+                    float numPosX = Easing::InSine(slideTimer_, maxSlideTime, endAddPosX + finalNumPosX[i], startAddPosX + finalNumPosX[i]);
+                    owner->gameDataNumSprite_[i]->GetSpriteTransform()->SetPosX(numPosX);
                 }
-                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(afterPosX);
-
-                owner->bookSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
-                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(afterPosX - beforePosX);
-
-                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(afterPosX - 20.0f);
-                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(afterPosX - 20.0f);
-
-                isFadeOut_ = true;
             }
+
+            slideTimer_ += elapsedTime;
+        }
+        else
+        {
+            // Spriteを指定の位置に設定
+
+            // 125
+            {
+                float finalGameDataBasePosX = 125.0f;
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataBaseSprite_[i]->GetSpriteTransform()->SetPosX(endAddPosX - finalGameDataBasePosX);
+                    owner->gameDataWordSprite_[i]->GetSpriteTransform()->SetPosX(endAddPosX - finalGameDataBasePosX);
+                }
+                owner->gameDataChoseSprite_->GetSpriteTransform()->SetPosX(endAddPosX - finalGameDataBasePosX);
+            }
+
+            // 0
+            {
+                owner->bookSprite_->GetSpriteTransform()->SetPosX(endAddPosX);
+                owner->choseLoadDataWordSprite_->GetSpriteTransform()->SetPosX(endAddPosX);
+            }
+
+            // 105
+            {
+                float finalPointPosX = 105.0f;
+                owner->pointWakuSprite_->GetSpriteTransform()->SetPosX(endAddPosX - finalPointPosX);
+                owner->pointRhombusSprite_->GetSpriteTransform()->SetPosX(endAddPosX - finalPointPosX);
+            }
+
+            // [01,02,03 文字]
+            {
+                float finalNumPosX[3] = { 260.0f, 290.0f, 245.0f };
+                for (int i = 0; i < static_cast<UINT>(SceneLoadGame::GameDataBase::Max); ++i)
+                {
+                    owner->gameDataNumSprite_[i]->GetSpriteTransform()->SetPosX(endAddPosX + finalNumPosX[i]);
+                }
+            }
+
+            isFadeOut_ = true;
         }
 
         // フェードアウト

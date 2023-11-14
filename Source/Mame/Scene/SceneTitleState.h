@@ -142,8 +142,8 @@ namespace SceneTitleState
     private:
         bool isChose_ = false;
         bool isPlayAnimation_ = false;
-        int currentState_ = 0;
-        int oldCurrentState_ = 0;
+        STATE currentState_ = STATE::Yes;
+        STATE oldCurrentState_ = STATE::No;
         float easingTimer_ = 0.0f;
         float animationTimer_ = 0.0f;
     };

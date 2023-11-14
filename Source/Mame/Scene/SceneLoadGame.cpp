@@ -73,11 +73,11 @@ void SceneLoadGame::CreateResource()
             L"./Resources/Image/UI/rhombus.png");
 
         gameDataNumSprite_[0] = std::make_unique<Sprite>(graphics.GetDevice(),
-            L"./Resources/Image/LoadGame/arrow.png");
+            L"./Resources/Image/LoadGame/01.png");
         gameDataNumSprite_[1] = std::make_unique<Sprite>(graphics.GetDevice(),
-            L"./Resources/Image/LoadGame/arrow.png");
+            L"./Resources/Image/LoadGame/02.png");
         gameDataNumSprite_[2] = std::make_unique<Sprite>(graphics.GetDevice(),
-            L"./Resources/Image/LoadGame/arrow.png");
+            L"./Resources/Image/LoadGame/03.png");
     }
 
     // ステートマシン
@@ -121,6 +121,7 @@ void SceneLoadGame::Initialize()
             gameDataWordSprite_[i]->GetSpriteTransform()->SetPos(spritePos[i]);
         }
 
+        // ゲームデータがないので暗くしてる
         gameDataBaseSprite_[2]->GetSpriteTransform()->SetColor(0.4f, 0.4f, 0.4f);
         gameDataWordSprite_[2]->GetSpriteTransform()->SetColorA(0.0f);
 
@@ -144,6 +145,21 @@ void SceneLoadGame::Initialize()
         pointWakuSprite_->GetSpriteTransform()->SetSize(60, 60);
         pointRhombusSprite_->GetSpriteTransform()->SetPos(105, 85);
         pointRhombusSprite_->GetSpriteTransform()->SetSize(60, 60);
+
+        // 01,02,03の数字初期化
+        for (int i = 0; i < static_cast<UINT>(GameDataBase::Max); ++i)
+        {
+            gameDataNumSprite_[i]->GetSpriteTransform()->SetSize(64, 37.5f);
+        }
+        gameDataNumSprite_[0]->GetSpriteTransform()->SetPos(260, 200);
+        gameDataNumSprite_[0]->GetSpriteTransform()->SetAngle(-18);
+        gameDataNumSprite_[1]->GetSpriteTransform()->SetPos(290, 365);
+        gameDataNumSprite_[1]->GetSpriteTransform()->SetAngle(22);
+        gameDataNumSprite_[2]->GetSpriteTransform()->SetPos(245, 540);
+        gameDataNumSprite_[2]->GetSpriteTransform()->SetAngle(-10);
+        // ゲームデータがないので暗くしている
+        gameDataNumSprite_[2]->GetSpriteTransform()->SetColor(0.4f, 0.4f, 0.4f);
+
     }
 
     // 変数初期化
@@ -196,7 +212,14 @@ void SceneLoadGame::Update(const float& elapsedTime)
         // ここでは処理書かない
     }
 
-    gameDataNumSprite_[0]->Vibration(elapsedTime, volume, breakTime);
+    // [01,02,03文字振動]
+    if (GetCurrentState() != static_cast<UINT>(STATE::SlideUi)
+        || GetCurrentState() != static_cast<UINT>(STATE::SlideUiFadeOut)
+        || GetCurrentState() != static_cast<UINT>(STATE::LoadTitle))
+    {
+        gameDataNumSprite_[GetSelectState()]->Vibration(elapsedTime, 1.5f, 0.07f);
+    }
+
 }
 
 // 描画
@@ -320,9 +343,6 @@ void SceneLoadGame::DrawDebug()
     Mouse& mouse = Input::Instance().GetMouse();
     DirectX::XMFLOAT2 mousePos = { static_cast<float>(mouse.GetPositionX()), static_cast<float>(mouse.GetPositionY()) };
     ImGui::InputFloat2("mouse", &mousePos.x);
-
-    ImGui::DragFloat("volume", &volume);
-    ImGui::DragFloat("breakTime", &breakTime);
 
     for (int i = 0; i < static_cast<UINT>(GameDataBase::Max); ++i)
     {

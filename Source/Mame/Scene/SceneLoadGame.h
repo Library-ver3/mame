@@ -53,9 +53,6 @@ public:// Šî–{“I‚ÈŠÖ”
 
     void ChangeScene();
 
-    float volume = 3.0f;
-    float breakTime = 1.0f;
-
 private:
     void UpdatePointRhombusSprite(const float& elapsedTime);
 

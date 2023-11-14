@@ -522,8 +522,8 @@ namespace SceneTitleState
         // 変数初期化
         isChose_ = false;
         isPlayAnimation_ = false;
-        currentState_ = 0;
-        oldCurrentState_ = 0;
+        currentState_ = STATE::Yes;
+        oldCurrentState_ = STATE::Yes;
         easingTimer_ = 0.0f;
         animationTimer_ = 0.0f;
     }
@@ -548,9 +548,17 @@ namespace SceneTitleState
             oldCurrentState_ = currentState_;
 
 #pragma region マウスによる選択
-            // ---------- マウスのカーソルに位置によってステートを変更 ----------
+            // ---------- マウスのカーソルの位置によってステートを変更 ----------
 
             // --- はい を選択 ---
+            if (currentState_ == STATE::Yes)
+            {
+                // 右クリックしたら No に飛ばす
+                if (mouse.GetButtonDown() & Mouse::BTN_RIGHT)
+                {
+                    ChangeCurrentState(STATE::No);
+                }
+            }
             if ((mousePos.x > mousePos_[0].left_) && (mousePos.x < mousePos_[0].right_) && (mousePos.y > mousePos_[0].top_) && (mousePos.y < mousePos_[0].bottom_))
             {
                 ChangeCurrentState(STATE::Yes);
@@ -584,7 +592,7 @@ namespace SceneTitleState
 #pragma region ゲームパッドによる選択 (keyboard)
             // ---------- 入力によるステート変更 ----------
 
-            if (currentState_ == static_cast<UINT>(STATE::Yes))
+            if (currentState_ == STATE::Yes)
             {   // [はい] にカーソルがある
                 // --- Bボタンを押したら「いいえ」に飛ばす ---
                 if (gamePad.GetButtonDown() & GamePad::BTN_B)
@@ -599,7 +607,7 @@ namespace SceneTitleState
                 }
             }
 
-            if (currentState_ == static_cast<UINT>(STATE::No))
+            if (currentState_ == STATE::No)
             {   // [いいえ] にカーソルがある
                 // --- スティックの傾きによるステート変更 ---
                 if (aLx < -0.8f)
@@ -609,7 +617,7 @@ namespace SceneTitleState
             }
 
             // ---------- ボタン入力による選択 ----------
-            if (currentState_ == static_cast<UINT>(STATE::Yes))
+            if (currentState_ == STATE::Yes)
             {   // ゲーム終了
                 if (gamePad.GetButtonDown() & GamePad::BTN_A)
                 {
@@ -618,7 +626,7 @@ namespace SceneTitleState
                 }
             }
             
-            if (currentState_ == static_cast<UINT>(STATE::No))
+            if (currentState_ == STATE::No)
             {   // selectに戻る
                 if (gamePad.GetButtonDown() & GamePad::BTN_A)
                 {
@@ -636,7 +644,7 @@ namespace SceneTitleState
                 float scale = Easing::InSine(easingTimer_, maxTime, 100.0f, 0.0f);
 
                 // 位置設定
-                if(currentState_==static_cast<UINT>(STATE::Yes))
+                if(currentState_== STATE::Yes)
                     owner->choseSprite_->GetSpriteTransform()->SetSpriteCenterPos(DirectX::XMFLOAT2(500, 425));
                 else
                     owner->choseSprite_->GetSpriteTransform()->SetSpriteCenterPos(DirectX::XMFLOAT2(675, 425));
@@ -696,7 +704,7 @@ namespace SceneTitleState
     void QuitGameChoseState::ChangeCurrentState(STATE state)
     {
         // 今選択しているものと、新しく選択したものが同じなら処理しない
-        currentState_ = static_cast<UINT>(state);
+        currentState_ = state;
         if (currentState_ == oldCurrentState_) return;
 
         easingTimer_ = 0.0f;

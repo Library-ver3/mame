@@ -51,6 +51,25 @@ namespace SceneLoadGameState
 
     class LoadGameChoseState : public State<SceneLoadGame>
     {
+    private:
+        enum class STATE
+        {
+            Yes,
+            No,
+        };
+
+        struct MousePos
+        {
+            float top_;
+            float bottom_;
+            float left_;
+            float right_;
+        }mousePos_[2] =
+        {
+            { 380.0f, 440.0f, 460.0f, 640.0f },
+            { 380.0f, 440.0f, 640.0f, 820.0f },
+        };
+
     public:
         LoadGameChoseState(SceneLoadGame* sceneLoadGame) : State(sceneLoadGame, "LoadGameChoseState") {}
         ~LoadGameChoseState() {}
@@ -64,17 +83,13 @@ namespace SceneLoadGameState
         bool ChoseSpriteUpdate(const float& elapsedTime);
         void PushButton();
 
-    private:
-        enum class STATE
-        {
-            Yes,
-            No,
-        };
+        void ChangeCurrentState(STATE state);
 
     private:
         bool isChose_           = false;  // true‚È‚ç‘I‘ð‰Â”\
         
-        int currentState_ = 0;
+        STATE currentState_ = STATE::Yes;
+        STATE oldCurrentState_ = STATE::Yes;
         float easingTimer_ = 0.0f;
         float animationTimer_ = 0.0f;
     };
